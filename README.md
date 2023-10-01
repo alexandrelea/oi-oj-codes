@@ -1,1 +1,1 @@
-This is a repository and it saves my codes in the Olympiad of Informatics.
+This is a repository and it saves my codes and some notes in OI(the Olympiad of Informatics).
