@@ -74,6 +74,8 @@ void exgcd(int a,int b,int &x,int &y,int &g){
 }
 ```
 
+别忘了加上 $c\bmod\gcd(a,b)=0$ 的特判！
+
 ## 素数
 
 素数，形式化的讲，即因子只有 $1$ 和其本身的数。判断素数也挺简单，我们有三种办法，先假定要判断的 $n$：
@@ -195,9 +197,13 @@ $f(n)=n$ 是积性函数。
 
 这里放上一个欧拉定理的升级版：费马小定理，即如果 $a\neq p$，则 $a^{p-1}\equiv 1\pmod p$，这是个好东西。
 
+当然，在两端乘上点什么也不是不可以。
+
 ### Pollard $\rho$ 质数判定
 
-这个东西依赖于费马小定理的逆定理——如果 $a^{m-1}\equiv 1\pmod m$
+这个东西依赖于费马小定理的逆定理——如果 $a^{m-1}\equiv 1\pmod m$，那么 $m$ 是质数。
+
+不幸的是这个定理不对。
 
 ## 模算数
 
@@ -223,5 +229,147 @@ $$a\alpha\bmod b=1\Leftrightarrow a\alpha+bk=1$$
 
 因此我们的问题转化成了求模线性不定方程，解法往上找。
 
-# 几何
-# 高数
+具体地，我们可以解出满足方程 $a\alpha+bk=1$ 的解 $\alpha,k$ 并注意判断 $\gcd(a,b)=1$ 来找出同余。
+
+## 模线性方程组
+
+我们需要解模线性方程组：
+
+$$
+\begin{cases}
+x\equiv a_1 \pmod {b_1}\\
+x\equiv a_2 \pmod {b_2}\\
+\cdots\\
+x\equiv a_n \pmod {b_n}\\
+\end{cases}
+$$
+
+下面，我们来试一试：
+
+设 $x_1,x_2,\cdots,x_n$ 满足下面好多个方程组：
+
+$$
+\begin{cases}
+x_1\equiv a_1\pmod {b_1}\\
+x_1\equiv 0\pmod {b_2}\\
+\cdots\\
+x_1\equiv 0\pmod {b_n}\\
+\end{cases}\\
+\begin{cases}
+x_2\equiv 0\pmod {b_1}\\
+x_2\equiv a_2\pmod {b_2}\\
+\cdots\\
+x_2\equiv 0\pmod {b_n}\\
+\end{cases}\\
+\cdots\\
+\begin{cases}
+x_n\equiv 0\pmod {b_1}\\
+x_n\equiv 0\pmod {b_2}\\
+\cdots\\
+x_n\equiv a_n\pmod {b_n}\\
+\end{cases}
+$$
+
+容易证明，$\sum x$ 满足整条同余方程组。
+
+那么，我们再次构造 $\chi_1,\chi_2,\cdots,\chi_n$ 满足下面的方程：
+
+$$
+\begin{cases}
+\chi_1\equiv 1\pmod {b_1}\\
+\chi_1\equiv 0\pmod {b_2}\\
+\cdots\\
+\chi_1\equiv 0\pmod {b_n}\\
+\end{cases}\\
+\begin{cases}
+\chi_2\equiv 0\pmod {b_1}\\
+\chi_2\equiv 1\pmod {b_2}\\
+\cdots\\
+\chi_2\equiv 0\pmod {b_n}\\
+\end{cases}\\
+\cdots\\
+\begin{cases}
+\chi_n\equiv 0\pmod {b_1}\\
+\chi_n\equiv 0\pmod {b_2}\\
+\cdots\\
+\chi_n\equiv 1\pmod {b_n}\\
+\end{cases}
+$$
+
+容易证明，$\sum a_k\chi_k$ 仍然满足全部方程。
+
+因此，我们可以列出下面方程
+
+$$
+\begin{cases}
+x\equiv a_1 \pmod {b_1}\\
+x\equiv a_2 \pmod {b_2}\\
+\cdots\\
+x\equiv a_n \pmod {b_n}\\
+\end{cases}
+$$
+
+并且保证 $b_1\perp b_2,\cdots,b_1\perp b_n,\cdots,$（或者说，$b$ 两两互质），那么，我们就可以设
+
+$$B=\prod b$$
+
+而后我们就可以得解
+
+$$x\equiv\sum_{i=1}^n\left(a_i\frac{B}{b_i}\left(\frac{B}{b_i}\right)^{-1}\right)\pmod B$$
+
+容易证明，$x+kB$ 也是方程的解。
+
+~~你可以使用这个技巧薄纱你的小伙伴。~~
+
+# 二项式系数
+
+二项式系数（据我所知）有三种写法：
+
+1. 熟知的 $C^n_m$ ~~艹nm~~ 写法。
+2. 不熟知的 $\ _mC_n$ ~~m艹n~~ 写法。
+3. 美国人常用的 $\binom nm$ 写法。
+
+这里将会采用第三种写法。
+
+二项式系数的定义是：
+
+$$\binom nm=\frac{n!}{m!(n-m)!}$$
+
+这个东西很恐怖。恐怖的要命。
+
+## 卢卡斯定理
+
+它的表述恒简单。
+
+$$\binom nm\equiv\binom{n\bmod p}{m\bmod p}\binom{\lfloor n/p\rfloor}{\lfloor m/p\rfloor}\pmod p$$
+
+证明，略。
+
+## 撸卡斯定理（或：扩展卢卡斯定理）
+
+怎么说呢……撸卡斯定理是恐怖的。
+
+由于 $(a\bmod b)\bmod c\neq a\bmod(bc)\bmod c$，因此我们只能采用一些暗黑的手段来解。
+
+把结果通过 CRT 组合是一个方法。
+
+请注意，之后要解的是：
+
+$$\binom{n}{k}\bmod m$$
+
+### 撸卡斯定理·1
+
+如果质因数分解得到 $m=\prod_{p_k|m}p^{e_{p_k}}$ 中所有的 $e_p=1$，那么我们就可以这样搞一搞：
+
+1. 求出所有的 $x_{p_k}=\binom{n}{m}\bmod p_k$，这个采用卢卡斯就可以。
+2. 列下面方程组并求解：
+
+$$
+\begin{cases}
+\binom{n}{m}\equiv x_{p_1}\pmod {p_1}\\
+\binom{n}{m}\equiv x_{p_2}\pmod {p_2}\\
+\cdots\\
+\binom{n}{m}\equiv x_{p_2}\pmod {p_3}\\
+\end{cases}
+$$
+
