@@ -4,7 +4,7 @@
 
 模算数是数论的基础。
 
-譬如 $10\equiv 2(\bmod 4)$，也可以写成 $10\bmod 4=2$。类似于小学的余数。
+譬如 $10\equiv 2\pmod 4$，也可以写成 $10\bmod 4=2$。类似于小学的余数。
 
 这里需要整除的定义，当 $b\bmod a=0$ 时，我们就记 $a\mid b$，否则就记 $a\nmid b$。
 
@@ -30,6 +30,49 @@ int gcd(int n,int m){
 最小公倍数同样可以使用上式定义，不过需要简单的改改符号：$\mathrm{lcm}(n,m)=\min\{k,n\mid k\text{ and }m\mid k\}$，这也挺简单。需要附加说明的是，$\dfrac{nm}{\gcd(n,m)}=\mathrm{lcm}(n,m)$。
 
 另外需要补上一个定义：如果两个整数 $n,m$ 满足 $\gcd(n,m)=1$，那么我们就记 $n\perp m$，叫作 $n,m$ 互素。
+
+### 解线性不定方程
+
+首先需要澄明的是 Bezout 定理：设 $a,b$ 是两个整数，并且不都是 $0$，那么就存在整数 $x,y$ 满足 $ax+by=\gcd(a,b)$。
+
+好，假定我们要解方程 $ax+by=c$，那么——
+
+第一步求出 $g=\gcd(a,b)$，如果 $g\nmid c$，那么方程无解。不需要解释。
+
+好的下面我们知道，
+
+$$ax+by=\gcd(a,b)$$
+
+众所周知，
+
+$$\gcd(a,b)=\gcd(b,a\bmod b)$$
+
+因此，我们可以做一个代换：$(a,b)\rightarrow(b,a\bmod b)$，那么
+
+$$ax+by=bx+(a\bmod b)y$$
+
+好，根据 $\bmod$ 的一种定义，我们就有
+
+$$ax+by=bx+\left(a-\left\lfloor\frac{a}{b}\right\rfloor b\right)y$$
+
+$$ax+by=bx+ay-\left\lfloor\frac{a}{b}\right\rfloor by$$
+
+于是，下一步，我们选 $a,b$ 为主元，随后搞一搞他，把 $a,b$ 的变换改成 $x,y$ 的变换就有
+
+$$ax+by=ay+b\left(x-\left\lfloor\frac{a}{b}\right\rfloor y\right)$$
+
+因而我们可以总结出下面的代换：
+
+$$(x,y)\to\left(y,x-\left\lfloor\frac{a}{b}\right\rfloor y\right)$$
+
+而后递归解。设 $x=1,y=0$，而后我们就可以搞出所有的解：
+
+```cpp
+void exgcd(int a,int b,int &x,int &y,int &g){
+    if(b==0) x=1,y=0,g=a;
+    else exgcd(b,a%b,y,x,g),y-=a/b*x;
+}
+```
 
 ## 素数
 
@@ -144,11 +187,41 @@ $$\varphi(n)=\prod_{p|n}(p^{e_p}-p^{e_p-1})=n\prod_{p|n}\left(1-\frac{1}{p}\righ
 
 这样我们就可以使用筛数法来解这东西。当然，使用欧拉筛法也不是不可能。因此可以使用上文介绍的素因数分解的方式来解出 $\varphi(n)$。
 
-$f(n)=n$ 有可能是积性函数。
+$f(n)=n$ 是积性函数。
 
+## 欧拉定理
 
+欧拉定理的内容是：若 $\gcd(a,m)=1$，则 $a^{\varphi(m)}\equiv1\pmod m$。这里证明就略掉了。
+
+这里放上一个欧拉定理的升级版：费马小定理，即如果 $a\neq p$，则 $a^{p-1}\equiv 1\pmod p$，这是个好东西。
+
+### Pollard $\rho$ 质数判定
+
+这个东西依赖于费马小定理的逆定理——如果 $a^{m-1}\equiv 1\pmod m$
+
+## 模算数
+
+这个东西很简单，我们可以轻易地丢出下面式子：
+
+$$ab\bmod c=(a\bmod c)(b\bmod c)\bmod c$$
+$$(a\pm b)\bmod c=(a\bmod c)\pm(b\bmod c)\bmod c$$
+
+然而除法却不行。
+
+这可怎么办？在模数 $p$ 为质数的时候费马小定理说：$a^{p-1}\equiv 1\pmod p$，因此，我们就有
+
+$$a^{p-2}\equiv\frac{1}{a}\pmod p$$
+$$a^{p-2}\bmod p=a^{-1}\bmod p$$
+
+这不就完了吗？但不幸的是模数 $k$ 有可能不是质数。这时我们就要抛出 $\bmod$ 的定义了：
+
+$$a\bmod b=c \Leftrightarrow a=bk+c$$
+
+因而，如果设 $a$ 的在模 $b$ 意义下的模数为 $\alpha$，那么我们就可以大胆的说：
+
+$$a\alpha\bmod b=1\Leftrightarrow a\alpha+bk=1$$
+
+因此我们的问题转化成了求模线性不定方程，解法往上找。
 
 # 几何
 # 高数
-
-这个打开贡献奖被跟你
