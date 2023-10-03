@@ -205,6 +205,66 @@ $f(n)=n$ 是积性函数。
 
 不幸的是这个定理不对。
 
+因而我们需要加上一点东西。
+
+以下内容（包括代码）均引用 Programming Challenges（作者：寂静山林）。
+
+> 可以证明，如果 $p$ 是一个”老素数“且 $e\ge 1$，则同余方程 $x^2\equiv 1\pmod {p^e}$ 仅有解 $x=\pm 1$。当给定一个”老素数“$p$，则 $p-1$ 为偶数，而且 $p-1$ 可以表示为 $p-1=2^s\cdot d$ 其中 $s$ 和 $d$ 均为正整数，$d$ 为奇数。根据上面两个结论，可以证明，对于 $1<a<p$，有 $a^d\equiv 1\pmod p$ 或者 $a^{2^r\cdot d}\equiv -1\pmod p,0\le r\le s-1$ 根据此条结论的逆否命题，只要我们找到一个基数 $a$ 使得 $a^d\not\equiv 1\pmod p$ 并且 $a^{2^r\cdot d}\not\equiv-1\pmod p,0\le r\le s-1$ 那么 $p$ 不是素数。米勒-拉宾素性测试即基于此推论。给定奇数 $n>2$，每当随机选取 $1<a<n$ 之间的一个数作为基数进行素性测试，如果均满足上面结论的要求，则 $n$ 有可能是一个素数，而且测试通过的次数越多，$n$ 为素数的可能性就越大，但若有一次测试不满足上述等式，那么可以确定 $n$ 为合数。给定数 $n$，若 $n$ 通过了一次测试，则 $n$ 不是素数的概率为 $\frac{1}{4}$，若数 $n$ 通过了 $k$ 次测试，则 n 是素数的概率为 $1-\frac{1}{4^k}$。
+>
+> 以下是米勒-拉宾素性测试的参考实现。
+
+```cpp
+//------------------------------7.1.2.cpp------------------------------//
+// 进行素性测试时的最大迭代次数。
+const int K = 20；
+// 以加法和乘法结合的方式进行模运算，以便最大限度地避免溢出。
+long long multiplyMod(long long a, long long b, long long mod)
+{
+ long long x = 0, y = a % mod;
+ while (b) {
+ if (b & 1) x = (x + y) % mod;
+ y = (y * 2) % mod;
+ b >>= 1;
+ }
+ return x;
+}
+// 快速幂取模。
+long long modulo(long long base, long long exponent, long long mod)
+{
+ long long x = 1, y = base;
+ while (exponent) {
+ if (exponent & 1) x = multiplyMod(x, y, mod);
+ y = multiplyMod(y, y, mod);
+ exponent >>= 1;
+ }
+ return x;
+}
+// 米勒-拉宾素性测试。
+bool isPrime(long long p)
+{
+ // 初步筛除。
+ if (p < 2) return false;
+ if (p == 2) return true;
+ if (!(p & 1)) return false;
+ // 准备。
+ long long q = p - 1;
+ while (!(q & 1)) q >>= 1;
+ // 执行测试。
+ for (int i = 0; i < K; i++) {
+ long long a = rand() % (p - 1) + 1;
+ long long t = q;
+ long long mod = modulo(a, t, p);
+ while (t != p - 1 && mod != 1 && mod != p - 1) {
+ mod = multiplyMod(mod, mod, p);
+ t <<= 1;
+ }
+ if (mod != p - 1 && !(t & 1)) return false;
+ }
+ return true;
+}
+//------------------------------7.1.2.cpp------------------------------//
+```
+
 ## 模算数
 
 这个东西很简单，我们可以轻易地丢出下面式子：
@@ -373,3 +433,116 @@ $$
 \end{cases}
 $$
 
+### 撸卡斯定理·2
+
+如果撸卡斯定理·1失败了，那么我们就有必要考虑撸卡斯定理·2.
+
+然而，不幸的是卢卡斯定理只对于质数模数起作用。
+
+# 几何学（计算几何）
+
+对于几何学，采用的一个建议是，在纸上完成一切可以由人类完成的计算任务，而后再由计算机完成余下的内容。
+
+# 矩阵
+
+## 计算规则
+
+两个长宽相等的矩阵可以完成加减，例如
+
+$$\begin{pmatrix}1&2\\3&4\end{pmatrix}+\begin{pmatrix}5&6\\7&8\end{pmatrix}=\begin{pmatrix}6&8\\10&12\end{pmatrix}$$
+
+$$\begin{pmatrix}1&2\\3&4\end{pmatrix}-\begin{pmatrix}5&6\\7&8\end{pmatrix}=\begin{pmatrix}-4&-4\\-4&-4\end{pmatrix}$$
+
+我们还可以通过数字乘以矩阵——矩阵数乘。例如，
+
+$$-\frac{1}{4}\times\begin{pmatrix}-4&-4\\-4&-4\end{pmatrix}=\begin{pmatrix}1&1\\1&1\end{pmatrix}$$
+
+而后，我们就要介绍该死的矩阵乘法了。
+
+如果有两个矩阵，第一个矩阵如果想要乘以第二个矩阵，那么需要满足一个条件：如果第一个矩阵是 $n\times m$ 的，那么第二个矩阵必须是 $m\times p$ 的，最终乘出来的矩阵一定是 $n\times p$ 的。
+
+矩阵乘法通常采用 $\mathrm O(n^3)$ 的算法，这可以被接受。通常矩阵乘法的结果是
+
+$$\begin{bmatrix}\end{bmatrix}$$
+
+## 递推式的计算
+
+直接参见[这里](https://www.luogu.com.cn/blog/322792/solution-uva10655)。
+
+> 现在我们设 $F_n=a^n+b^n$。我们知道，
+>
+> $$a^3+b^3=(a+b)(a^2-ab+b^2)$$
+> 
+> 因此我们完全可以考虑通过递推式来求它。~~根据直觉~~，我们设
+> 
+> $$(a+b)(F_{n-1})-S=F_n$$
+> 
+> 即
+> 
+> $$(a+b)(a^{n-1}+b^{n-1})-S=a^n+b^n$$
+> 
+> 拆开括号，就有
+> 
+> $$a^n+b^n+a^{n-1}b+ab^{n-1}-S=a^n+b^n$$
+> 
+> 而后，消掉同类项并移相：
+> 
+> $$S=a^{n-1}b+ab^{n-1}$$
+> 
+> 提公因式 $ab$，就有
+> 
+> $$S=ab(a^{n-2}+b^{n-2})$$
+> 
+> 最后，将 $S$ 带入，就有
+> 
+> $$a^n+b^n=(a+b)(a^{n-1}+b^{n-1})-ab(a^{n-2}b^{n-2})$$
+> 
+> 改写成 $F_n$ 的形式，就是这样：
+> 
+> $$F_n=sF_{n-1}-pF_{n-2}$$
+> 
+> 这里
+> 
+> $$F_0=2$$
+> 
+> $$F_1=s$$
+> 
+> 现在，我们有了一种新的方式，即递推法求出 $F_n$，然而肯定会爆炸。
+> 
+> 然而，上面的式子……看上去就像下面的式子：
+> 
+> $$F_n=F_{n-1}+F_{n-2}$$
+> 
+> $$F_0=0,F_1=1$$
+> 
+> 斐波那契数列的推广！
+> 
+> 众所周知，斐波那契可以通过矩阵快速幂来解，然而在这个例子中该如何使用呢？
+> 
+> 现在，我们假设
+> 
+> $$\begin{bmatrix}F_n&F_{n-1}\end{bmatrix}=\begin{bmatrix}F_{n-1}&F_{n-2}\end{bmatrix}\times \mathbf M$$
+> 
+> 我们知道，$\mathbf M$ 必然是二行二列的，不然就乘不动了。设
+> 
+> $$\mathbf M=\begin{bmatrix}m_{11}&m_{12}\\m_{21}&m_{22}\end{bmatrix}$$
+> 
+> 而乘法结果会长成这样：
+> 
+> $$\begin{bmatrix}F_n&F_{n-1}\end{bmatrix}=\begin{bmatrix}F_{n-1}&F_{n-2}\end{bmatrix}\times\begin{bmatrix}m_{11}&m_{12}\\m_{21}&m_{22}\end{bmatrix}$$
+> 
+> $$=\begin{bmatrix}F_{n-1}m_{11}+F_{n-2}m_{21}&F_{n-1}m_{12}+F_{n-2}m_{22}\end{bmatrix}$$
+> 
+> 由于 $F_n=sF_{n-1}-pF_{n-2}$ 则 $m_{11}=s,m_{21}=-p$；而由于第二项 $F_{n-1}$ 与 $F_{n-1}$ 相同，所以 $m_{12}=1,m_{22}=0$。
+> 
+> 所以
+> 
+> $$\mathbf M=\begin{bmatrix}s&1\\-p&0\end{bmatrix}$$
+> 
+> 由于矩阵乘法满足结合律，所以我们可以先计算出 $\mathbf M^{n-1}$ 再乘以原来的 $\begin{bmatrix}s&2\end{bmatrix}$ 并取出第一项就是我们的答案。
+> 
+> 所以，
+> 
+> $$\begin{bmatrix}F_n&F_{n-1}\end{bmatrix}=\begin{bmatrix}F_1&F_0\end{bmatrix}\times\mathbf M^{n-1}=\begin{bmatrix}s&2\end{bmatrix}\times\begin{bmatrix}s&1\\-p&0\end{bmatrix}^{n-1}$$
+> 
+> 注意特判 $n$ 的初始条件。
