@@ -373,20 +373,33 @@ $$
 
 $$B=\prod b$$
 
-而后我们就可以得解
+而后我们就可以得解（请注意，那个大大的逆元下面有一个角标 $b_i$ 代表这个大分式以 $b_i$ 为模取逆元）
 
-$$x\equiv\sum_{i=1}^n\left(a_i\frac{B}{b_i}\left(\frac{B}{b_i}\right)^{-1}\right)\pmod B$$
+$$x\equiv\sum_{i=1}^n\left(a_i\frac{B}{b_i}\left(\frac{B}{b_i}\right)^{-1}_{b_i}\right)\pmod B$$
 
 容易证明，$x+kB$ 也是方程的解。
 
-~~你可以使用这个技巧薄纱你的小伙伴。~~
+下面给出具体实现。
+
+```cpp
+lnt crt(int n,lnt *a,lnt *b){
+    lnt B=1,x=0;
+    for(int i=1;i<=n;i++) B*=b[i];
+    for(int i=1;i<=n;i++){
+        lnt bb=B/b[i],ivbb,q,g;
+        exgcd(bb,b[i],g,ivbb,q);
+        x=((x+bb*ivbb%B*a[i]%B)%B+B)%B;
+    }
+    return (x+B)%B;
+}
+```
 
 # 二项式系数
 
 二项式系数（据我所知）有三种写法：
 
 1. 熟知的 $C^n_m$ ~~艹nm~~ 写法。
-2. 不熟知的 $\ _mC_n$ ~~m艹n~~ 写法。
+2. 苏联的 $\ _mC_n$ ~~m艹n~~ 写法。
 3. 美国人常用的 $\binom nm$ 写法。
 
 这里将会采用第三种写法。
