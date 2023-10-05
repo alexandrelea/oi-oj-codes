@@ -90,6 +90,11 @@ int main(){
         cout<<dI(1)<<endl;
     }
     cnt=1;
-    //bye, hope i can solve this problem tomorrow :-)
+    // now we've found two point (h[i],0) and (h[i+1],0)
+    // and two circles r[i],r[i+1]
+    // we can found a point 
+
+    // the integral is correct!!!
+    
     return 0;
 }
