@@ -476,9 +476,35 @@ $$-\frac{1}{4}\times\begin{pmatrix}-4&-4\\-4&-4\end{pmatrix}=\begin{pmatrix}1&1\
 
 如果有两个矩阵，第一个矩阵如果想要乘以第二个矩阵，那么需要满足一个条件：如果第一个矩阵是 $n\times m$ 的，那么第二个矩阵必须是 $m\times p$ 的，最终乘出来的矩阵一定是 $n\times p$ 的。
 
-矩阵乘法通常采用 $\mathrm O(n^3)$ 的算法，这可以被接受。通常矩阵乘法的结果是
+矩阵乘法通常采用 $\mathrm O(n^3)$ 的算法，这可以被接受。
 
-$$\begin{bmatrix}\end{bmatrix}$$
+假设两个矩阵 $\mathbf A$ 和 $\mathbf B$ 可以相乘，那么我们可以直接使用下面的例子
+
+$$
+\mathbf A=\begin{bmatrix}
+a_{1,1}&\ldots&a_{1,m}\\
+\vdots&\ddots&\vdots\\
+a_{n,1}&\ldots&a_{n,m}
+\end{bmatrix}
+$$
+
+$$
+\mathbf B=\begin{bmatrix}
+b_{1,1}&\ldots&b_{1,p}\\
+\vdots&\ddots&\vdots\\
+a_{m,1}&\ldots&a_{m,p}
+\end{bmatrix}
+$$
+
+$$
+\mathbf A\times\mathbf B=\begin{bmatrix}
+\sum_{k=1}^{m}{a_{1,k}b_{k,1}}&\ldots&\sum_{k=1}^{m}{a_{n,k}b_{k,1}}\\
+\vdots&\ddots&\vdots\\
+\sum_{k=1}^{m}{a_{1,k}b_{k,p}}&\ldots&\sum_{k=1}^{m}{a_{n,k}b_{k,p}}
+\end{bmatrix}
+$$
+
+很好。这个式子令人头脑发晕，因此可以结合下面的两个例子反向记忆矩阵乘法。
 
 ## 递推式的计算
 
