@@ -15,7 +15,7 @@ double ans=0;
 bool type[SIZE];
 // board of functions, for final INTEGRATION.
 double bod[SIZE];
-// if we uses circle function y=sqrt(v^2-(x-p)^2), we must record v and the p.
+// if we uses circle function y=sqrt(v^2-(x-p)^2), we must record radius v and the positition p.
 double v[SIZE],p[SIZE];
 // if we uses the line function y=kx+b, we must record k and b.
 double k[SIZE],b[SIZE];
@@ -93,8 +93,27 @@ int main(){
     // now we've found two point (h[i],0) and (h[i+1],0)
     // and two circles r[i],r[i+1]
     // we can found a point 
-
-    // the integral is correct!!!
     
+    for(int i=1;i<=n;i++){
+        // Ahh we can only look two circles! and we can add the last connect!! new hope!
+        // now we have 2 points on the x-axis: (0,h[i+1]) and (0,h[i]) and radius r[i+1] and r[i]
+        // and we can get the hypot... hy=sqrt((h[i+1]-h[i])^2-(r[i+1]-r[i])^2) and like the first we can got two points
+        double delh=fabs(h[i+1]-h[i]),delr=fabs(r[i+1]-r[i]),nx,ny,hyp=sqrt(sqr(h[i+1]-h[i])-sqr(r[i+1]-r[i])),hx=0,hy=0;
+        // and now we get x=(hyp^2+delh^2-delr^2)/(2delh),for y we can throw it in the circle function.
+        nx=(sqr(hyp)+sqr(delh)-sqr(delr))/(2*delh);
+        
+        // because a prallel quad, we must add (nx,ny) and (0,hx) a vector (x,y).
+        // but, the vector is not clear now.
+        // two points (nx+delx,ny+dely) and (delx,hy+dely) must specify two circle functions.
+        // so we can only find nx....?
+        if(r[i+1]>r[i]){
+            ny=cirf(r[i+1],h[i+1],nx),hy=h[i];
+            double nnx=nx,nny=ny;
+            // (nnx,nny) is on the line of (nx,ny) and (0,h[i+1]) same for next if :-)
+            // but it may perp the x-axis :-O
+            // ahaha now we get the new line y=((ny)/(nx-h[i]))x+((h[i]*ny)/(h[i]-nx))
+            // we must find the root of line and the circle. we will find the root tomorrow :-) bye!
+        }else ny=cirf(r[i],h[i],nx),hy=h[i+1];
+    }
     return 0;
 }
