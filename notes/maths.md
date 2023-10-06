@@ -452,6 +452,8 @@ $$
 
 然而，不幸的是卢卡斯定理只对于质数模数起作用。
 
+因此我们需要考虑卢卡斯定理对于质数的幂的作用。
+
 # 几何学（计算几何）
 
 对于几何学，采用的一个建议是，在纸上完成一切可以由人类完成的计算任务，而后再由计算机完成余下的内容。
@@ -559,3 +561,182 @@ $$\begin{bmatrix}\end{bmatrix}$$
 > $$\begin{bmatrix}F_n&F_{n-1}\end{bmatrix}=\begin{bmatrix}F_1&F_0\end{bmatrix}\times\mathbf M^{n-1}=\begin{bmatrix}s&2\end{bmatrix}\times\begin{bmatrix}s&1\\-p&0\end{bmatrix}^{n-1}$$
 > 
 > 注意特判 $n$ 的初始条件。
+
+## 高斯消元
+
+众所周知，线性方程组
+
+$$
+\begin{cases}
+k_{1,1}x_1+k_{1,2}x_2+\cdots+k_{1,n}x_n=b_1\\
+k_{2,1}x_1+k_{2,2}x_2+\cdots+k_{2,n}x_n=b_2\\
+\cdots\ \cdots\ \cdots\\
+k_{n,1}x_1+k_{n,2}x_2+\cdots+k_{n,n}x_n=b_n\\
+\end{cases}
+$$
+
+可以写成系数矩阵的形式
+
+$$
+\mathbf K\cdot\mathbf x=\mathbf B
+$$
+
+其中
+
+$$
+\mathbf K=
+\begin{bmatrix}
+k_{1,1}&k_{1,2}&\ldots&k_{1,n}\\
+k_{2,1}&k_{2,2}&\ldots&k_{2,n}\\
+\vdots&\vdots&\ddots&\vdots\\
+k_{n,1}&k_{n,2}&\ldots&k_{n,n}
+\end{bmatrix}
+$$
+
+$$
+\mathbf x=
+\begin{bmatrix}
+x_1\\ x_2\\ \vdots\\ x_n
+\end{bmatrix}
+$$
+
+$$
+\mathbf B=
+\begin{bmatrix}
+b_1\\ b_2\\ \vdots\\ b_n
+\end{bmatrix}
+$$
+
+这样我们就可以通过矩阵乘法来简化表达方式，这样未知数的个数可以迅猛地增加。
+
+下一步，我们需要将 $\mathbf{K}$ 和 $\mathbf{B}$ 写成一个矩阵，再度简化表示线性方程组的方式：
+
+$$
+\mathbf E=\left[
+\begin{array}{cccc|c}
+k_{1,1}&k_{1,2}&\ldots&k_{1,n}&b_1\\
+k_{2,1}&k_{2,2}&\ldots&k_{2,n}&b_2\\
+\vdots&\vdots&\ddots&\vdots&\vdots\\
+k_{n,1}&k_{n,2}&\ldots&k_{n,n}&b_n
+\end{array}\right]
+$$
+
+好，下面我们就来解线性方程组。由于某些该死的原因，这里需要给出一个例子：
+
+$$
+\begin{cases}
+2x_1+x_2-x_3=8\\
+-3x_1-x_2+2x_3=-11\\
+-2x_1+x_2+2x_3=-3
+\end{cases}
+$$
+
+写成矩阵的形式，就是
+
+$$
+\left[\begin{array}{ccc|c}
+2&1&-1&8\\
+-3&-1&2&-11\\
+-2&1&2&-3
+\end{array}\right]
+$$
+
+好的下面我们对矩阵里面的元素进行消去，我们首先聚焦于第一行，此时我们的操作就是除了第一行里的所有元素乘以……算了算了还是用计算说明吧。
+
+现在我们看第一个未知数的系数，而后请看我的操作：
+
+
+$$
+\left[\begin{array}{ccc|c}
+2&1&-1&8\\
+-3\cdot\frac{2}{-3}&-1\cdot\frac{2}{-3}&2\cdot\frac{2}{-3}&-11\cdot\frac{2}{-3}\\
+-2\cdot\frac{2}{-2}&1\cdot\frac{2}{-2}&2\cdot\frac{2}{-2}&-3\cdot\frac{2}{-2}
+\end{array}\right]
+$$
+
+很好，我们给所有的除了第一行意外所有的行乘以该未知数系数所在的列闭上该未知数的系数。我们继续
+
+$$
+\left[\begin{array}{ccc|c}
+2&1&-1&8\\
+2&\frac{2}{3}&\frac{4}{-3}&\frac{22}{3}\\
+2&-1&-2&3
+\end{array}\right]
+$$
+
+很好，而后我们让后两行减去第一行，而后~~为了省点事~~我们把第二行换成整数：
+
+$$
+\left[\begin{array}{ccc|c}
+2&1&-1&8\\
+0&\frac{1}{3}&\frac{1}{3}&\frac{2}{3}\\
+0&2&1&5
+\end{array}\right]
+$$
+
+$$
+\left[\begin{array}{ccc|c}
+2&1&-1&8\\
+0&1&1&2\\
+0&2&1&5
+\end{array}\right]
+$$
+
+第二步，我们简简单单地用第二行做相同的事，不过使用第二个未知数：
+
+$$
+\left[\begin{array}{ccc|c}
+2&0&-2&6\\
+0&1&1&2\\
+0&0&-1&1
+\end{array}\right]
+$$
+
+而后，我们对第三行再次做相同的事情：
+
+
+$$
+\left[\begin{array}{ccc|c}
+2&0&0&4\\
+0&1&0&3\\
+0&0&-1&1
+\end{array}\right]
+$$
+
+很好！我们把所有的系数拿掉，我们就得到了最终算出的矩阵：
+
+$$
+\left[\begin{array}{ccc|c}
+1&0&0&2\\
+0&1&0&3\\
+0&0&1&-1
+\end{array}\right]
+$$
+
+最终我们就拿到了 $\mathbf x$：
+
+$$
+\mathbf x=\begin{bmatrix}
+2\\3\\-1
+\end{bmatrix}
+$$
+
+矩阵乘法的验算表明我们的做法是正确的。
+
+不过，请注意，我们每次在第 $i$ 行消元时一定要将该系数最大的行交换到该行然后计算且不能换回去！
+
+```cpp
+for(int i=1;i<=n;i++){
+    double maxn=-1.0/0.0;
+    int p;
+    for(int j=i+1;j<=n;j++) if(maxn<data[j][j]) maxn=data[j][p=j];
+    for(int j=1;j<=n+1;j++) swap(data[p][j],data[i][j]);
+    if(data[i][i]==0) return cout<<"No Solution"<<endl,0;
+    for(int j=1;j<=n;j++){
+        if(j==i) continue;
+        double co=data[j][i]/data[i][i];
+        for(int k=1;k<=n+1;k++) data[j][k]-=data[i][k]*co;
+    }
+}
+for(int i=1;i<=n;i++) data[i][n+1]/=data[i][i];
+```
