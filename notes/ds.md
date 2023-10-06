@@ -1,3 +1,8 @@
+标题：部分数据结构
+
+# 线性数据结构
+
+
 以下是 Stasis 原文：
 
 这种 lj 数据结构能将原本的前缀和 $\mathrm O(1)$ 查询和 $\mathrm O(n)$ 修改的缺陷平衡至 $\mathrm O(\log n\cdot\log\log n)$ 修改与查询。而且，如果您嫌麻烦的话，也可以实现一个 $\mathrm O(\log^2 n)$ 查询，$\mathrm O(\log n)$ 修改前缀和的数据结构。缺点是空间复杂度会变大。
