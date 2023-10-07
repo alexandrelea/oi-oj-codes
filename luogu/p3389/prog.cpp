@@ -19,6 +19,6 @@ int main(){
             for(int k=1;k<=n+1;k++) data[j][k]-=data[i][k]*co;
         }
     }
-    for(int i=1;i<=n;i++) data[i][n+1]/=data[i][i];
+    for(int i=1;i<=n;i++) data[i][n+1]/=data[i][i],cout<<fixed<<setprecision(2)<<data[i][n+1]<<endl;
     return 0;
 }
