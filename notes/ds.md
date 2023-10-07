@@ -47,4 +47,10 @@ priority_queue<int,vector<int>,greater<int>> pq; //大根堆
 
 当然，使用 pbds 也不是不行。
 
-## Feswick树
+## Fenwick 树
+
+这种东西也叫做树状数组，不过我们没有功夫去给它建一棵树。
+
+它是求前缀和的利器。
+
+既然它是一棵树，那么我们就需要让它长得像一棵树
