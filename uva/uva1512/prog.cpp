@@ -1,5 +1,6 @@
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
+using namespace std;
 int n,m;
 char ex[25][85];
 int min(int x,int y){
@@ -8,13 +9,13 @@ int min(int x,int y){
 int max(int x,int y){
     return x>y?x:y;
 }
-int pow(int a,int b,int p){
+int pow(int a,int b,int p=2011){
     int ans=1;
     for(;b!=0;b/=2,a=a*a%p) if(b%2==1) ans=ans*a%p;
     return ans;
 }
 int inv(int x){
-    return pow(x,2009,2011);
+    return pow(x,2009);
 }
 int calc(int x0,int y0,int x1,int y1){
     int bal=x0;
@@ -22,15 +23,15 @@ int calc(int x0,int y0,int x1,int y1){
         bal=i;
         break;
     }
-    // printf("# %d %d %d %d\n",x0,y0,x1,y1);
+    printf("# %d %d %d %d\n",x0,y0,x1,y1);
     int sum=0,now=1,sym=1;
     for(int i=y0;i<=y1;i++){
         if(ex[bal][i]>='0'&&ex[bal][i]<='9'){
             int b=ex[bal][i]-'0',e=1;
             if(ex[bal-1][i+1]>='0'&&ex[bal-1][i+1]<='9') e=ex[bal-1][i+1]-'0';
-            now=(now*pow(b,e,2011))%2011;
+            now=(now*pow(b,e))%2011;
         }else if(ex[bal][i]=='-'&&ex[bal][i+1]=='.'){
-            if(i-2<y0||ex[bal][i-2]=='*'||ex[bal][i-2]=='-') sym=sym*(-1);
+            if(i-2<y0||ex[bal][i-2]=='*'||ex[bal][i-2]=='-'||ex[bal][i-2]=='+') sym=sym*(-1);
             else sum+=(sym*now),now=1,sym=-1;
         }else if(ex[bal][i]=='*');
         else if(ex[bal][i]=='+') sum=((sum+now*sym)%2011+2011)%2011,now=1,sym=1;
@@ -44,7 +45,7 @@ int calc(int x0,int y0,int x1,int y1){
             }
             int b=calc(x0,i+2,x1,nxb-2),e=1;
             if(ex[bal-1][nxb+1]>='0'&&ex[bal-1][nxb+1]<='9') e=ex[bal-1][nxb+1]-'0';
-            now=(sym*now*pow(b,e,2011)%2011+2011)%2011;
+            now=(sym*now*pow(b,e)%2011+2011)%2011;
             i=nxb,sym=1;
         }else if(ex[bal][i]=='-'&&ex[bal][i+1]=='-'){
             int frm=i,fxe=i+1;
@@ -83,12 +84,12 @@ int calc(int x0,int y0,int x1,int y1){
         }
     }
     sum=((sum+now*sym)%2011+2011)%2011,now=1;
-    // for(int i=x0;i<=x1;i++){
-    //     for(int j=y0;j<=y1;j++) printf("%c",ex[i][j]);
-    //     if(i==bal) printf("=%d",sum);
-    //     printf("\n");
-    // }
-    // printf("\n");
+    for(int i=x0;i<=x1;i++){
+        for(int j=y0;j<=y1;j++) printf("%c",ex[i][j]);
+        if(i==bal) printf("=%d",sum);
+        printf("\n");
+    }
+    printf("\n");
     return sum;
 }
 void maintain(){
