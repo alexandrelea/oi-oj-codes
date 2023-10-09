@@ -10,7 +10,7 @@ int main(){
     for(int l=3;l<=n;l++){
         for(int i=1,j=l;j<=n;i++,j++){
             if(c[i]==c[j]) f[i][j]=f[i+1][j-1];
-            else for(int k=i;k<j;k++) f[i][j]=min(f[i][j],f[i][k]+f[k+1][j]);
+            for(int k=i;k<j;k++) f[i][j]=min(f[i][j],f[i][k]+f[k+1][j]);
         }
     }
     cout<<f[1][n]<<endl;
