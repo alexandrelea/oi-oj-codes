@@ -1,60 +1,36 @@
 #include <iostream>
-#include <map>
-#include <set>
-#include <vector>
+#include <cstring>
 using namespace std;
+const int SIZE=1e6+10;
+int n,p,a,b,lasp;
+int las[SIZE],nex[SIZE],uord[SIZE]={},pot[SIZE]={};
+void rmov(int x){
+    las[nex[x]]=las[x];
+    nex[las[x]]=nex[x];
+    uord[x]=0;
+}
 void maintain(int caseno){
-    int n,p,a[5010],b[5010],lasp,cnt=0;
-    set<int> se;
-    map<int,int> cov;
-
     cin>>n>>p,lasp=p;
-    for(int i=1;i<=p;i++) cin>>a[i]>>b[i],se.insert(a[i]),se.insert(b[i]);
-    for(auto it:se) cov[it]=cnt++;
-    for(int i=1;i<=p;i++) a[i]=cov[a[i]],b[i]=cov[b[i]];
-
-    // a list of continued numbers can be SELFLOOP.
-    // two lists of continued numbers can be PASSING.
-    // overall we can emu the link/emu the AB
-    // we use the second method --- ?
+    memset(uord,0,sizeof(uord));
+    memset(pot,0,sizeof(pot));
+    for(int i=0;i<n;i++) las[i]=i-1,nex[i]=i+1;
+    las[0]=n-1,nex[n-1]=0;
+    for(int i=1;i<=p;i++){
+        cin>>a>>b;
+        uord[a]=1,uord[b]=-1;
+        pot[a]=b,pot[b]=a;
+    }
+    for(int i=0;i<n;i++) if(uord[i]==0) rmov(i); 
+    int nw=0;
     while(lasp){
-        // for(int i=1;i<=p;i++) cout<<a[i]<<" "<<b[i]<<endl;
-        int fna=-1,fnb=-1;
-        for(int i=1;i<=p;i++){
-            if(a[i]==-1||b[i]==-1) continue;
-            if((a[i]+1)%cnt==b[i]||(b[i]+1)%cnt==a[i]){
-                fna=i;
-                break;
-            }
+        bool fund=false;
+        while(uord[nw]==0) nw=(nw+1)%n;
+        for(int i=nex[nw];i!=nw&&(!fund);i=nex[i]){
+            int u=i,v=nex[i];
+            if(uord[u]==uord[v]&&(nex[pot[u]]==pot[v]||nex[pot[v]]==pot[u])) rmov(u),rmov(v),rmov(pot[u]),rmov(pot[v]),lasp-=2,fund=true;
+            else if(pot[u]==v||pot[v]==u) rmov(u),rmov(v),lasp--,fund=true;
         }
-        for(int i=1;i<=p;i++){
-            if(a[i]==-1||b[i]==-1) continue;
-            bool fnd=false;
-            for(int j=1;j<=p;j++){
-                if(i==j||a[j]==-1||b[j]==-1) continue;
-                if((a[i]+1)%cnt==a[j]||(a[j]+1)%cnt==a[i]||(b[i]+1)%cnt==b[j]||(b[j]+1)%cnt==b[i]){
-                    fnd=true;
-                    fna=i,fnb=j;
-                    break;
-                }
-            }
-            if(fnd) break;
-        }
-        if(fna==-1) break;
-        // else if(fnb==-1) cout<<"SELFLOOP ["<<a[fna]<<" "<<b[fna]<<"] "<<fna<<endl;
-        // else cout<<"PASSING ["<<a[fna]<<" "<<b[fna]<<"] ["<<a[fnb]<<" "<<b[fnb]<<"] "<<fna<<" "<<fnb<<endl;
-        se.clear(),cov.clear(),cnt=0;
-        a[fna]=b[fna]=-1,lasp--;
-        if(fnb!=-1) a[fnb]=b[fnb]=-1,lasp--;
-        for(int i=1;i<=p;i++){
-            if(i==fna||i==fnb||a[i]==-1||b[i]==-1) continue;
-            se.insert(a[i]),se.insert(b[i]);
-        }
-        for(auto it:se) cov[it]=cnt++;
-        for(int i=1;i<=p;i++){
-            if(a[i]==-1||b[i]==-1) continue;
-            a[i]=cov[a[i]],b[i]=cov[b[i]];
-        }
+        if(!fund) break;
     }
     cout<<"Case #"<<caseno<<": ";
     if(lasp==0) cout<<"YES"<<endl;
