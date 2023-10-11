@@ -480,6 +480,8 @@ $$
 
 然而，不幸的是卢卡斯定理只对于质数模数起作用。
 
+因此我们需要考虑卢卡斯定理对于质数的幂的作用。
+
 # 几何学（计算几何）
 
 对于几何学，采用的一个建议是，在纸上完成一切可以由人类完成的计算任务，而后再由计算机完成余下的内容。
@@ -502,9 +504,35 @@ $$-\frac{1}{4}\times\begin{pmatrix}-4&-4\\-4&-4\end{pmatrix}=\begin{pmatrix}1&1\
 
 如果有两个矩阵，第一个矩阵如果想要乘以第二个矩阵，那么需要满足一个条件：如果第一个矩阵是 $n\times m$ 的，那么第二个矩阵必须是 $m\times p$ 的，最终乘出来的矩阵一定是 $n\times p$ 的。
 
-矩阵乘法通常采用 $\mathrm O(n^3)$ 的算法，这可以被接受。通常矩阵乘法的结果是
+矩阵乘法通常采用 $\mathrm O(n^3)$ 的算法，这可以被接受。
 
-$$\begin{bmatrix}\end{bmatrix}$$
+假设两个矩阵 $\mathbf A$ 和 $\mathbf B$ 可以相乘，那么我们可以直接使用下面的例子
+
+$$
+\mathbf A=\begin{bmatrix}
+a_{1,1}&\ldots&a_{1,m}\\
+\vdots&\ddots&\vdots\\
+a_{n,1}&\ldots&a_{n,m}
+\end{bmatrix}
+$$
+
+$$
+\mathbf B=\begin{bmatrix}
+b_{1,1}&\ldots&b_{1,p}\\
+\vdots&\ddots&\vdots\\
+a_{m,1}&\ldots&a_{m,p}
+\end{bmatrix}
+$$
+
+$$
+\mathbf A\times\mathbf B=\begin{bmatrix}
+\sum_{k=1}^{m}{a_{1,k}b_{k,1}}&\ldots&\sum_{k=1}^{m}{a_{n,k}b_{k,1}}\\
+\vdots&\ddots&\vdots\\
+\sum_{k=1}^{m}{a_{1,k}b_{k,p}}&\ldots&\sum_{k=1}^{m}{a_{n,k}b_{k,p}}
+\end{bmatrix}
+$$
+
+很好。这个式子令人头脑发晕，因此可以结合下面的两个例子反向记忆矩阵乘法。
 
 ## 递推式的计算
 
@@ -587,3 +615,265 @@ $$\begin{bmatrix}\end{bmatrix}$$
 > $$\begin{bmatrix}F_n&F_{n-1}\end{bmatrix}=\begin{bmatrix}F_1&F_0\end{bmatrix}\times\mathbf M^{n-1}=\begin{bmatrix}s&2\end{bmatrix}\times\begin{bmatrix}s&1\\-p&0\end{bmatrix}^{n-1}$$
 > 
 > 注意特判 $n$ 的初始条件。
+
+## 高斯消元
+
+众所周知，线性方程组
+
+$$
+\begin{cases}
+k_{1,1}x_1+k_{1,2}x_2+\cdots+k_{1,n}x_n=b_1\\
+k_{2,1}x_1+k_{2,2}x_2+\cdots+k_{2,n}x_n=b_2\\
+\cdots\ \cdots\ \cdots\\
+k_{n,1}x_1+k_{n,2}x_2+\cdots+k_{n,n}x_n=b_n\\
+\end{cases}
+$$
+
+可以写成系数矩阵的形式
+
+$$
+\mathbf K\cdot\mathbf x=\mathbf B
+$$
+
+其中
+
+$$
+\mathbf K=
+\begin{bmatrix}
+k_{1,1}&k_{1,2}&\ldots&k_{1,n}\\
+k_{2,1}&k_{2,2}&\ldots&k_{2,n}\\
+\vdots&\vdots&\ddots&\vdots\\
+k_{n,1}&k_{n,2}&\ldots&k_{n,n}
+\end{bmatrix}
+$$
+
+$$
+\mathbf x=
+\begin{bmatrix}
+x_1\\ x_2\\ \vdots\\ x_n
+\end{bmatrix}
+$$
+
+$$
+\mathbf B=
+\begin{bmatrix}
+b_1\\ b_2\\ \vdots\\ b_n
+\end{bmatrix}
+$$
+
+这样我们就可以通过矩阵乘法来简化表达方式，这样未知数的个数可以迅猛地增加。
+
+下一步，我们需要将 $\mathbf{K}$ 和 $\mathbf{B}$ 写成一个矩阵，再度简化表示线性方程组的方式：
+
+$$
+\mathbf E=\left[
+\begin{array}{cccc|c}
+k_{1,1}&k_{1,2}&\ldots&k_{1,n}&b_1\\
+k_{2,1}&k_{2,2}&\ldots&k_{2,n}&b_2\\
+\vdots&\vdots&\ddots&\vdots&\vdots\\
+k_{n,1}&k_{n,2}&\ldots&k_{n,n}&b_n
+\end{array}\right]
+$$
+
+好，下面我们就来解线性方程组。由于某些该死的原因，这里需要给出一个例子：
+
+$$
+\begin{cases}
+2x_1+x_2-x_3=8\\
+-3x_1-x_2+2x_3=-11\\
+-2x_1+x_2+2x_3=-3
+\end{cases}
+$$
+
+写成矩阵的形式，就是
+
+$$
+\left[\begin{array}{ccc|c}
+2&1&-1&8\\
+-3&-1&2&-11\\
+-2&1&2&-3
+\end{array}\right]
+$$
+
+好的下面我们对矩阵里面的元素进行消去，我们首先聚焦于第一行，此时我们的操作就是除了第一行里的所有元素乘以……算了算了还是用计算说明吧。
+
+现在我们看第一个未知数的系数，而后请看我的操作：
+
+
+$$
+\left[\begin{array}{ccc|c}
+2&1&-1&8\\
+-3\cdot\frac{2}{-3}&-1\cdot\frac{2}{-3}&2\cdot\frac{2}{-3}&-11\cdot\frac{2}{-3}\\
+-2\cdot\frac{2}{-2}&1\cdot\frac{2}{-2}&2\cdot\frac{2}{-2}&-3\cdot\frac{2}{-2}
+\end{array}\right]
+$$
+
+很好，我们给所有的除了第一行意外所有的行乘以该未知数系数所在的列闭上该未知数的系数。我们继续
+
+$$
+\left[\begin{array}{ccc|c}
+2&1&-1&8\\
+2&\frac{2}{3}&\frac{4}{-3}&\frac{22}{3}\\
+2&-1&-2&3
+\end{array}\right]
+$$
+
+很好，而后我们让后两行减去第一行，而后~~为了省点事~~我们把第二行换成整数：
+
+$$
+\left[\begin{array}{ccc|c}
+2&1&-1&8\\
+0&\frac{1}{3}&\frac{1}{3}&\frac{2}{3}\\
+0&2&1&5
+\end{array}\right]
+$$
+
+$$
+\left[\begin{array}{ccc|c}
+2&1&-1&8\\
+0&1&1&2\\
+0&2&1&5
+\end{array}\right]
+$$
+
+第二步，我们简简单单地用第二行做相同的事，不过使用第二个未知数：
+
+$$
+\left[\begin{array}{ccc|c}
+2&0&-2&6\\
+0&1&1&2\\
+0&0&-1&1
+\end{array}\right]
+$$
+
+而后，我们对第三行再次做相同的事情：
+
+
+$$
+\left[\begin{array}{ccc|c}
+2&0&0&4\\
+0&1&0&3\\
+0&0&-1&1
+\end{array}\right]
+$$
+
+很好！我们把所有的系数拿掉，我们就得到了最终算出的矩阵：
+
+$$
+\left[\begin{array}{ccc|c}
+1&0&0&2\\
+0&1&0&3\\
+0&0&1&-1
+\end{array}\right]
+$$
+
+最终我们就拿到了 $\mathbf x$：
+
+$$
+\mathbf x=\begin{bmatrix}
+2\\3\\-1
+\end{bmatrix}
+$$
+
+矩阵乘法的验算表明我们的做法是正确的。
+
+不过，请注意，我们每次在第 $i$ 行消元时一定要将该系数最大的行交换到该行然后计算且不能换回去！
+
+```cpp
+for(int i=1;i<=n;i++){
+    double maxn=-1.0/0.0;
+    int p;
+    for(int j=i+1;j<=n;j++) if(maxn<data[j][j]) maxn=data[j][p=j];
+    for(int j=1;j<=n+1;j++) swap(data[p][j],data[i][j]);
+    if(data[i][i]==0) return cout<<"No Solution"<<endl,0;
+    for(int j=1;j<=n;j++){
+        if(j==i) continue;
+        double co=data[j][i]/data[i][i];
+        for(int k=1;k<=n+1;k++) data[j][k]-=data[i][k]*co;
+    }
+}
+for(int i=1;i<=n;i++) data[i][n+1]/=data[i][i];
+```
+
+# 微积分
+
+## 极限
+
+极限的标准化定义不是人话。不过，笔记里肯定会尽可能写成人话。
+
+那么，如果 $f$ 是一个函数，如果 $0<|x-a|<\delta$ 时 $|f(x)-L|<\epsilon$ 那么我们就记
+$$\lim_{x\to a}f(x)=L$$
+为 $f(x)$ 在 $x$ 趋近于 $a$ 时的极限为 $L$。
+
+也就是说我们可以尽量缩小 $a-\delta<x<a+\delta$ 的范围而后我们也就能缩小 $f(x)-L<f(a)<f(x)+L$ 的范围，因而我们就可以通过尽量缩小范围来限制极限的数值。不幸的是只使用定义对我们没有用。
+
+因此，我们需要加上一点点东西。
+
+当 $m$ 和 $b$ 都是常数，那么 $\lim_{x\to a}(mx+b)=ma+b$；而当 $c$ 是常数，那么 $\lim_{x\to a}c=c$。而 $\lim_{x\to a}x=a$ 也能解释的通。
+
+我要开始吟唱了。
+
+如果 $\lim_{x\to a}f(x)=L$ 并且 $\lim_{x\to a}g(x)=M$ 那么$\lim_{x\to a}[f(x)\pm g(x)]=L\pm M$。当然这个可以叠加使用。
+
+如果 $\lim_{x\to a}f(x)=L$ 并且 $\lim_{x\to a}g(x)=M$ 那么$\lim_{x\to a}[f(x)\cdot g(x)]=L\cdot M$。当然这个也可以叠加使用。自然，幂也是可以运行的，除法也可以，根号也也也可以！
+
+而后就是一点点奇怪的分段函数，如果 $f(x)=\begin{cases}x-3&x\neq 4\\5&x=4\end{cases}$ 但是 $\lim_{x\to 4}f(x)=1$！为什么？这是因为在缩小区间的时候，我们不会管额外的点，因为缩小区间的时候我们不会管太多。
+
+然而 $f(x)=\mathrm{sgn}\ x=\begin{cases}-1&x<0\\0&x=0\\1&0<x\end{cases}$ 那么 $\lim_{x\to 0}f(x)$ 不存在！为什么？这是因为，在缩小区间的时候，如果我们最后缩小区间的时候，如果卡住，我们就没有办法缩小区间了……悲。因此，为了更加具体的描述极限的行为，我们笼统地定义两个极限，分别是从负方向接近和从正方向接近： 
+
+$$\lim_{x\to a^+}f(x)=\mathrm{lef}$$
+$$\lim_{x\to a^-}f(x)=\mathrm{rig}$$
+
+不幸的是，由于某些原因，我们的极限当然可以达到无穷，以及类似 $\lim_{x\to\infty}(1/x)=0$ 的反常行为！！！好吧……似乎并不反常。
+
+好吧。
+
+接下来的故事都很熟悉，导数。
+
+## 导数
+
+导数是一个重要的微积分的概念（如果我没有记错，我已经**第七次**介绍微积分了……），那么，导数是什么？
+
+众所周知，正切函数是 $\tan$，全称 tangent，翻译过来就是“切线”。可是切线究竟是什么？
+
+初中知识告诉我们，圆的切线就是与圆只有一个交点的直线.
+
+![tang](tang.png)
+
+可是如果换作一个函数，怎么可能只有一个交点呢？例如 $y=\sin x$，切线与函数的交点最多就有两个！
+
+![tangsin](tangsin.png)
+
+于是我们被迫缩小它的定义。也就是说，函数与它的切线只在它的交点的附近不存在交点。
+
+好吧，这个定义有点笼统。
+
+下面我们需要开始画图了，例如，我们在 $\sin$ 函数的这个点上找它的切线：
+
+![sinpoint](sinpoint.png)
+
+众所周知直线由两个点构成，因此我们试试这个：
+
+![sinbj1](sinbj1.png)
+
+然而这段距离有点太大，不能做到切线的要求，因此我们缩小范围：
+
+![sinbj2](sinbj2.png)
+
+不幸的是，这段距离还是有点大。不过我们还是可以轻易地找到两个点的坐标。设第一个点的 $x$ 坐标为 $x_0$，那么我们就可以得到两个点的坐标分别是 $(x_0,f(x))$ 和 $(x_0+\Delta x,f(x_0+\Delta x))$，而后我们可以那道它的斜率
+
+$$\frac{f(x_0+\Delta x)-f(x_0)}{\Delta x}$$
+
+而后，我们可以试试，如果 $\Delta x$ 变成 $0$ ……呃……然后分母就会变成 $0$。
+
+呃……呃……呃……呃……呃……呃……呃……呃……呃……对了！
+
+极限！极限可以让我们做到逼近一个数的同时不去真正的达到它！
+
+因此，我们求斜率的式子可以被改写成这样：
+
+$$\lim_{\Delta x\to 0}\frac{f(x_0+\Delta x)-f(x_0)}{\Delta x}$$
+
+好，这便是导数的定义，我们添加上等号以及它的左边，就有
+
+$$f'(x_0)=\lim_{\Delta x\to 0}\frac{f(x_0+\Delta x)-f(x_0)}{\Delta x}$$
