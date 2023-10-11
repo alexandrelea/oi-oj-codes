@@ -230,7 +230,170 @@ void addd(int x,int v){
 
 ```cpp
 const int SIZE=1e5+10;
-int summ[4*SIZE],lass[4*SIZE],
+int a[SIZE],n;
+int sumv[SIZE*4],tagv[SIZE*4],ivl[SIZE*4],ivr[SIZE*4];
+void build(int cur,int beg,int end){
+    ivl[cur]=beg,ivr[cur]=end;
+    if(beg==end) sumv[cur]=a[beg];
+    else{
+        int mid=beg+(end-beg)/2;
+        build(cur*2,beg,mid);
+        build(cur*2+1,mid+1,end);
+        sumv[cur]=sumv[cur*2]+sumv[cur*2+1];
+    }
+}
+void pushdown(int cur){
+    if(tagv[cur]==0) return;
+    int lch=cur*2,rch=cur*2+1,tag=tagv[cur];
+    tagv[lch]+=tag,tagv[rch]+=tag;
+    sumv[lch]+=tag*(ivr[lch]-ivl[lch]+1),sumv[rch]+=tag*(ivr[rch]-ivl[rch]+1);
+    tagv[cur]=0;
+}
+int query(int cur,int qul,int qur){
+    if(qul<=ivl[cur]&&ivr[cur]<=qur) return sumv[cur];
+    pushdown(cur);
+    int qry=0;
+    if(qul<=ivr[cur*2]) qry+=query(cur*2,qul,qur);
+    if(ivl[cur*2+1]<=qur) qry+=query(cur*2+1,qul,qur);
+    return qry;
+}
+void modify(int cur,int mol,int mor,int mov){
+    if(mol<=ivl[cur]&&ivr[cur]<=mor) sumv[cur]+=mov*(ivr[cur]-ivl[cur]+1),tagv[cur]+=mov;
+    else{
+        pushdown(cur);
+        if(mol<=ivr[cur*2]) modify(cur*2,mol,mor,mov);
+        if(ivl[cur*2+1]<=mor) modify(cur*2+1,mol,mor,mov);
+        sumv[cur]=sumv[cur*2]+sumv[cur*2+1];
+    }
+}
+```
+
+## 平衡树
+
+这个平衡树是一种不好吃的东西。
+
+平衡树的基础是二叉查找树，即 BST。
+
+BST的基础操作即插入和删除。插入时可以赋予节点权值，左侧为比权值小的，右侧为比权值大的。例如我们按顺序插入 1 9 2 6 0 8 1 7：
+
+```plaintext
+     1(+)
+    / \
+   0   9
+      /
+     2
+      \
+       6
+        \
+         8
+        /
+       7
+```
+
+可以看到，这种东西很容易形成长链，然后时间复杂度就爆炸了。
+
+我们需要一种可以将二叉查找树平衡的方法。例如，我们将下面的树进行右旋：
+
+```plaintext
+     a
+    / \
+   b   c
+  / \
+ d   e
+
+d<b<e<a<c
+```
+
+首先，置 `a` 的左节点为 `e`。
+
+```plaintext
+     a
+     |\
+   b | c
+  /  |
+ d   e
+```
+
+而后，置 `b` 的右节点为 `a`。
+
+```plaintext
+     b
+    / \
+   d   a
+      / \
+     e   c
+
+d<b<e<a<c
+```
+
+仍然满足原来的树的条件。
+
+然后，我们需要找出是否旋转的方式。
+
+### Splay
+
+这种东西是伸展树，这棵该死的玩意暂时不说。（太他妈难嘣了）
+
+### Treap
+
+这是树堆，通过在树上满足堆的性质，所以叫做树堆。
+
+树堆的每个节点包含两个值：权值和堆值，权值需要满足 BST，而堆值满足堆的要求。因为旋转对于BST的性质不会做出影响，因而可以通过旋转满足堆的性质；又因为堆值是随机生成的因此可以基本满足平衡的要求。
+
+首先是插入，插入时需要满足BST，并且对于非堆的节点做出更改。例如，插入 `3 1 4 5 9 2 6`，我们就有（这里随机的堆值是 `2 8 3 6 7 0 9`，并且堆的儿子比堆的父亲大）
+
+```plaintext
+3(2)
+```
+
+```plaintext
+    3(2)
+   /
+ 1(8)
+```
+
+```plaintext
+    3(2)
+   /    \
+ 1(8)  4(3)
+```
+
+```plaintext
+    3(2)
+   /    \
+ 1(8)  4(3)
+          \
+         5(6)
+```
+
+```plaintext
+    3(2)
+   /    \
+ 1(8)  4(3)
+          \
+         5(6)
+            \
+           9(7)
+```
+
+```plaintext
+    3(2)
+   /    \
+ 1(8)  4(3)
+   \      \
+  2(0)   5(6)
+            \
+           9(7)
+
+(Here is not specify the request. So we must rotate the tree.)
+
+    3(2)
+      | \
+ 1(8) | 4(3)
+   \  |   \
+   2(0)  5(6)
+            \
+           9(7)
 ```
 
 ## 威廉树
@@ -273,4 +436,4 @@ int summ[4*SIZE],lass[4*SIZE],
 
 可以看出，对于每个点 $V_x$，以及它的父亲 $V_f$，它们的边权 $E_{V_x,V_f}=\sum_{k=f}^xA_k$。（看得懂吧 :-）而后，我们的前缀和就好算了，可以直接把某个点到根节点的边权加起来。这当然是显然的。
 
-好的那么我们要开始修改点了：啊？等下，等下我先去看[原文](https://www.luogu.com.cn/discuss/638729?page=1&sort=time-d) :-(……
+好的那么我们要开始修改点了：啊？等下，等下我先去看[原文](https://www.luogu.com.cn/discuss/638729?page=1&sort=time-d)，好，先不搞了。
