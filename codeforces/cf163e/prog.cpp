@@ -1,56 +1,83 @@
 #include <iostream>
-#include <cstring>
+#include <string>
 #include <queue>
 using namespace std;
 const int SIZE=1e6+10,SIGMA=26;
-int k,n;
-char str[1500][SIZE/10+9];
-bool inn[1500];
-int ats[1500];
-int trans[SIZE][SIGMA],ed[SIZE],fail[SIZE],tot=1;
-vector<int> topo;
-void insert(char *s,int &at){
-    int len=strlen(s),cur=1;
-    for(int i=0;i<len;i++){
-        ed[cur]++;
-        if(trans[cur][s[i]-'a']==0) trans[cur][s[i]-'a']=++tot;
-        cur=trans[cur][s[i]-'a'];
+int n,k,buc[SIZE],tot,ed[SIZE],trans[SIZE][SIGMA],fail[SIZE];
+vector<int> edge[SIZE];
+void insert(string str,int id){
+    int co=0;
+    for(char ch:str){
+        if(trans[co][ch-'a']==0) trans[co][ch-'a']=++tot;
+        co=trans[co][ch-'a'];
     }
-    ed[cur]++;
-    at=cur;
+    ed[id]=co;
 }
 void build(){
     queue<int> que;
-    que.push(1),fail[1]=0;
-    for(int i=0;i<SIGMA;i++) trans[0][i]=1;
+    for(int i=0;i<SIGMA;i++) if(trans[0][i]!=0) que.push(trans[0][i]);
     while(!que.empty()){
-        int cur=que.front();que.pop();
-        for(int i=0;i<SIGMA;i++){
-            if(trans[cur][i]==0) trans[cur][i]=trans[fail[cur]][i];
-            else fail[trans[cur][i]]=trans[fail[cur]][i],que.push(trans[cur][i]);
-        }
+        int co=que.front();que.pop();
+        for(int i=0;i<SIGMA;i++)
+            if(trans[co][i]) fail[trans[co][i]]=trans[fail[co]][i],que.push(trans[co][i]);
+            else trans[co][i]=trans[fail[co]][i];
+        edge[fail[co]].push_back(co);
     }
 }
-int query(char *s){
-    int len=strlen(s),cur=1,ans=0;
-    for(int i=0;i<len;i++){
-        cur=trans[cur][s[i]-'a'];
-        for(int now=cur;now!=0;now=fail[now]) ans+=ed[now];
-    }
-    return ans;
+int cnt=0,dfn[SIZE],sz[SIZE],c[SIZE];
+void add(int x,int v){
+    while(x<=tot) c[x]+=v,x+=x&-x;
+}
+int query(int x){
+    int s=0;
+    while(x) s+=c[x],x-=x&-x;
+    return s;
+}
+void dfs(int co){
+    dfn[co]=cnt++,sz[co]=1;
+    for(int ni:edge[co]) dfs(ni),sz[co]+=sz[ni];
 }
 int main(){
-    scanf("%d %d",&k,&n);
-    for(int i=1;i<=n;i++) scanf("%s",str[i]),insert(str[i],ats[i]),inn[i]=true;
-    build();
-    while(k--){
-        scanf("%s",str[0]);
-        if(str[0][0]=='?'){
-            printf("%d\n",query(str[0]+1));
-        }else if(str[0][0]=='+'||str[0][0]=='-'){
-            int m=stoi(str[0]+1);
-            if(str[0][0]=='+'&&!inn[m]) ed[ats[m]]++,inn[m]=true;
-            else if(str[0][0]=='-'&&inn[m]) ed[ats[m]]--,inn[m]=false;
+    cin>>n>>k;
+    for(int i=1;i<=k;i++){
+        string st;
+        cin>>st;
+        insert(st,i);
+    }
+    build(),dfs(0);
+    for(int i=1;i<=k;i++){
+        int id=ed[i];
+        add(dfn[id],1);
+        add(dfn[id]+sz[id],-1);
+        buc[i]=1;
+    }
+    for(int i=1;i<=n;i++){
+        char c;
+        cin>>c;
+        if(c=='?'){
+            string s;
+            cin>>s;
+            int co=0;
+            long long ans=0;
+            for(char ch:s){
+                co=trans[co][ch-'a'];
+                ans+=query(dfn[co]);
+            }
+            cout<<ans<<endl;
+        }else{
+            int id;
+            cin>>id;
+            if(c=='-'){
+                if(!buc[id]) continue;
+                buc[id]=0,id=ed[id];
+                add(dfn[id],-1);
+                add(dfn[id]+sz[id],1);
+            }else{
+                if(buc[id]) continue;
+                buc[id]=1,id=ed[id];
+                add(dfn[id],1);
+                add(dfn[id]+sz[id],-1);
+            }
         }
     }
     return 0;
