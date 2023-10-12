@@ -1,65 +1,76 @@
 #include <iostream>
-#include <cstring>
 #include <queue>
+#include <string>
 #include <cmath>
 using namespace std;
-const int SIGMA=30,SIZE=2e6+10;
-struct ahocorasick{
-    int trans[SIZE][SIGMA],fail[SIZE],ed[SIZE],tot=1,bcktrans[SIZE][SIGMA];
-    bool changed=false;
-    ahocorasick(){
-        memset(trans,0,sizeof trans);
-        memset(fail,0,sizeof fail);
-        memset(ed,0,sizeof ed);
-        tot=1;
+struct ACAM{
+    const static int SIGMA=26;
+    vector<vector<int>> trans,bktr;
+    vector<int> fail,ed;
+    bool changed,got;
+    int tot,root=0,tans=0;
+    ACAM(int ze){
+        fail=vector<int>((ze+1)*SIGMA,0),ed=vector<int>((ze+1)*SIGMA);
+        //fail.resize(ze+1),ed.resize(ze+1);
+        bktr=trans=vector<vector<int>>((ze+1)*SIGMA,vector<int>(SIGMA,0));
+        // trans.resize(ze+1,vector<int>(SIGMA));
+        root=tot=0,changed=got=false;
     }
-    void insert(char *c){
-        changed=true;
-        int len=strlen(c),cur=1;
-        for(int i=0;i<len;i++){
-            if(trans[cur][c[i]-'a']==0) trans[cur][c[i]-'a']=++tot;
-            cur=trans[cur][c[i]-'a'];
+    void insert(string st){
+        if(!changed) trans=bktr;
+        int co=root;
+        for(auto ch:st){
+            if(trans[co][ch-'a']==0) trans[co][ch-'a']=(++tot);
+            co=trans[co][ch-'a'];
         }
-        ed[cur]++;
+        ed[co]++,changed=true,got=false;
     }
     void build(){
         if(!changed) return;
-        changed=false;
-        memcpy(bcktrans,trans,sizeof trans);
+        changed=false,got=false;
+        bktr=trans,fail=vector<int>(fail.size(),0);
         queue<int> que;
-        for(int i=0;i<SIGMA;i++) trans[0][i]=1;
-        que.push(1),fail[1]=0;
+        // for(int i=0;i<SIGMA;i++) trans[0][i]=1;
+        // que.push(1),fail[1]=0;
+        for(int i=0;i<SIGMA;i++) if(trans[root][i]!=0) que.push(trans[root][i]);
         while(!que.empty()){
-            int cur=que.front();que.pop();
+            int co=que.front();que.pop();
             for(int i=0;i<SIGMA;i++){
-                if(trans[cur][i]==0) trans[cur][i]=trans[fail[cur]][i];
-                else fail[trans[cur][i]]=trans[fail[cur]][i],que.push(trans[cur][i]);
+                if(trans[co][i]) fail[trans[co][i]]=trans[fail[co]][i],que.push(trans[co][i]);
+                else trans[co][i]=trans[fail[co]][i];
             }
         }
     }
-    int acquery(char *s){
-        int len=strlen(s),cur=1,ans=0;
-        for(int i=0;i<len;i++){
-            cur=trans[cur][s[i]-'a'];
-            for(int now=cur;now!=0;now=fail[now]) ans+=ed[now];
+    int query(string st){
+        if(got) return tans;
+        got=true;
+        int co=root,ans=0;
+        for(auto ch:st){
+            co=trans[co][ch-'a'];
+            for(int nw=co;nw!=0;nw=fail[nw]) ans+=ed[nw];
         }
-        return ans;
+        return tans=ans;
     }
-}inserted[18],deleted[18];
+}inserted[13]={ACAM(2),ACAM(4),ACAM(8),ACAM(16),ACAM(32),ACAM(64),ACAM(128),ACAM(256),ACAM(512),ACAM(1024),ACAM(2048),ACAM(4096),ACAM(8192)},
+deleted[13]={ACAM(2),ACAM(4),ACAM(8),ACAM(16),ACAM(32),ACAM(64),ACAM(128),ACAM(256),ACAM(512),ACAM(1024),ACAM(2048),ACAM(4096),ACAM(8192)};
 int main(){
-    int n;
-    int o;
-    char str[SIZE];
-    cin>>n;
-    while(n--){
-        scanf("%d %s",&o,str);
-        int lln=log2(strlen(str));
-        if(o==1) inserted[lln].insert(str);
-        if(o==2) deleted[lln].insert(str);
-        if(o==3){
+    int m,t;
+    string st;
+    cin>>m;
+    while(m--){
+        cin>>t>>st;
+        if(t==1||t==2){
+            int lon=log2(st.length());
+            if(t==1) inserted[lon].insert(st);
+            else deleted[lon].insert(st);
+        }else{
             int ins=0,del=0;
-            for(int i=0;i<18;i++) inserted[i].build(),ins+=inserted[i].acquery(str);
-            for(int i=0;i<18;i++) deleted[i].build(),del+=deleted[i].acquery(str);
+            for(int i=0;i<13;i++){
+                inserted[i].build();
+                deleted[i].build();
+                ins+=inserted[i].query(st);
+                del+=deleted[i].query(st);
+            }
             cout<<ins-del<<endl<<flush;
         }
     }
