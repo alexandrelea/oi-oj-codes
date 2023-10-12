@@ -1,46 +1,25 @@
 #include <iostream>
+#include <cstring>
 #include <cmath>
 using namespace std;
-const long double endtemp=1e-60,delt=0.9999;
-int n,w,lastans,best,nowans,x,y,max,maxt;
-int sum,pos,recsum,recpos,a[30];
-bool flag,vis[30];
-long double temp=1e40;
-int calc(){
-    int cnt,ans;
-    cnt=ans=0;
-    for(int i=1;i<=n;i++){
-        if(cnt+a[i]>w) ans++,cnt=0;
-        cnt+=a[i];
-    }
-    if(cnt>0) ans++;
-    return ans;
-}
-bool accept(long double temp,long double delta){
-    long double raand;
-    if(delta>=0) return true;
-    raand=((long double)(rand()%2348284))/2348284.0;
-    if(raand<exp(delta/temp)) return true;
-    else return false;
-}
+const int SIZE=3e5+10;
+int n,a[20];
+int f[SIZE],s[SIZE],ans,k;
 int main(){
-    srand(time(nullptr));
-    cin>>n>>w;
+    memset(f,0x3f,sizeof(f)),f[0]=0;
+    cin>>n>>k;
     for(int i=1;i<=n;i++) cin>>a[i];
-    best=lastans=calc();
-    for(int i=1;i<=5;i++){
-        while(temp>endtemp){
-            y=x=rand()%n+1;
-            while(y==x) y=rand()%n+1;
-            swap(x,y);
-            nowans=calc();
-            if(accept(temp,lastans-nowans)) lastans=nowans;
-            else swap(x,y);
-            if(nowans<best) best=nowans;
-            temp*=delt;
+    for(int i=1;i<(1<<n);i++){
+        for(int j=1;j<=n;j++){
+            if(i&(1<<(j-1))) s[i]+=a[j];
         }
-        temp=1e40;
     }
-    cout<<best<<endl;
+    for(int i=1;i<(1<<n);i++){
+        for(int j=i;j;j=(j-1)&i){
+            if(s[j]>k) continue;
+            f[i]=min(f[i],f[i-j]+1);
+        }
+    }
+    cout<<f[(1<<n)-1]<<endl;
     return 0;
 }
