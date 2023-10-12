@@ -620,3 +620,49 @@ its
 请注意在 Trie 树中我们会专门标记字符串的结尾以保证不会漏掉某个幸运的字符串。
 
 它们的插入和删除都是及其简单的，只需要动态建点就行了。
+
+值得一提的是，Trie 树的边可以视作离散数学中的转移方程（不要和动规的转移方程混淆！）。因此我们可以给转移边取名 trans（这是后话）。
+
+## AC自动机
+
+AC 自动机就是 Trie 树和 KMP 的捆绑销售，因此这里对它不进行过多介绍，因而我们只需要简述建边过程——首先，我们采用拓扑建边，如果有边的话，就把它的 trans 指向的节点的 fail 转移指向该节点的 fail 转移到的节点转移到相同的字符所转移上的节点。
+
+至于查询，我们把尾标记加起来就好啦……对于每个要查询的字符串我们就不停地按照 trans 转移就可了。
+
+```cpp
+const int SIGMA=256,SIZE=2e6+10;
+int trans[SIZE][SIGMA],fail[SIZE],ed[SIZE],tot=1;
+void insert(char *c){
+    int len=strlen(c),cur=1;
+    for(int i=0;i<len;i++){
+        if(trans[cur][c[i]]==0) trans[cur][c[i]]=++tot;
+        cur=trans[cur][c[i]];
+    }
+    ed[cur]++;
+}
+void build(){
+    queue<int> que;
+    for(int i=0;i<SIGMA;i++) trans[0][i]=1;
+    que.push(1),fail[1]=0;
+    while(!que.empty()){
+        int cur=que.front();que.pop();
+        for(int i=0;i<SIGMA;i++){
+            if(trans[cur][i]==0) trans[cur][i]=trans[fail[cur]][i];
+            else fail[trans[cur][i]]=trans[fail[cur]][i],que.push(trans[cur][i]);
+        }
+    }
+}
+int acquery(char *s){
+    int len=strlen(s),cur=1,ans=0;
+    for(int i=0;i<len;i++){
+        cur=trans[cur][s[i]];
+        for(int now=cur;now!=0&&ed[now]!=-1;now=fail[now]){
+            ans+=ed[now];
+            ed[now]=-1;
+        }
+    }
+    return ans;
+}
+```
+
+然后它的进阶内容就包含拓扑反向建边以及树合并。
