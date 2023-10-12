@@ -1,10 +1,12 @@
 #include <iostream>
 #include <cstring>
 #include <queue>
+#include <cmath>
 using namespace std;
 const int SIGMA=30,SIZE=2e6+10;
 struct ahocorasick{
     int trans[SIZE][SIGMA],fail[SIZE],ed[SIZE],tot=1,bcktrans[SIZE][SIGMA];
+    bool changed=false;
     ahocorasick(){
         memset(trans,0,sizeof trans);
         memset(fail,0,sizeof fail);
@@ -12,6 +14,7 @@ struct ahocorasick{
         tot=1;
     }
     void insert(char *c){
+        changed=true;
         int len=strlen(c),cur=1;
         for(int i=0;i<len;i++){
             if(trans[cur][c[i]-'a']==0) trans[cur][c[i]-'a']=++tot;
@@ -20,6 +23,8 @@ struct ahocorasick{
         ed[cur]++;
     }
     void build(){
+        if(!changed) return;
+        changed=false;
         memcpy(bcktrans,trans,sizeof trans);
         queue<int> que;
         for(int i=0;i<SIGMA;i++) trans[0][i]=1;
@@ -38,11 +43,9 @@ struct ahocorasick{
             cur=trans[cur][s[i]-'a'];
             for(int now=cur;now!=0;now=fail[now]) ans+=ed[now];
         }
-        memcpy(trans,bcktrans,sizeof trans);
-        memset(fail,0,sizeof fail);
         return ans;
     }
-}inserted,deleted;
+}inserted[18],deleted[18];
 int main(){
     int n;
     int o;
@@ -50,12 +53,14 @@ int main(){
     cin>>n;
     while(n--){
         scanf("%d %s",&o,str);
-        if(o==1) inserted.insert(str);
-        if(o==2) deleted.insert(str);
+        int lln=log2(strlen(str));
+        if(o==1) inserted[lln].insert(str);
+        if(o==2) deleted[lln].insert(str);
         if(o==3){
-            inserted.build();
-            deleted.build();
-            cout<<inserted.acquery(str)-deleted.acquery(str)<<endl<<flush;
+            int ins=0,del=0;
+            for(int i=0;i<18;i++) inserted[i].build(),ins+=inserted[i].acquery(str);
+            for(int i=0;i<18;i++) deleted[i].build(),del+=deleted[i].acquery(str);
+            cout<<ins-del<<endl<<flush;
         }
     }
     return 0;
