@@ -1,7 +1,24 @@
 #include <bits/stdc++.h>
-#pragma GCC optimize(3,"Ofast")
 using namespace std;
 const int SIZE=4e5+10;
+int read(){
+    int x=0,w=1;
+    char ch=0;
+    while(ch<'0'||ch>'9'){
+        if(ch=='-') w=-1;
+        ch=getchar();
+    }
+    while(ch>='0'&&ch<='9'){
+        x=x*10+(ch-'0');
+        ch=getchar();
+    }
+    return x*w;
+}
+void print(int x){
+    if(x<0) putchar('-'),print(-x);
+    if(x>=10) print(x/10);
+    putchar(x%10+'0');
+}
 int n,col[SIZE],loc[SIZE],m;
 vector<int> G[SIZE];
 int dep[SIZE],fh[SIZE],siz[SIZE];
@@ -49,11 +66,10 @@ void assign(int lf,int rt,int val){
     wtf.insert(omg(lf,rt,val));
 }
 int main(){
-    cin>>n>>m;
-    for(int i=1;i<=n;i++) cin>>loc[i];
+    n=read(),m=read();
+    for(int i=1;i<=n;i++) loc[i]=read();
     for(int i=1;i<n;i++){
-        int u,v;
-        cin>>u>>v;
+        int u=read(),v=read();
         G[u].emplace_back(v);
         G[v].emplace_back(u);
     }
@@ -66,10 +82,9 @@ int main(){
     }
     wtf.insert(omg(st,n,cl));
     while(m--){
-        int o,u,c;
-        cin>>o>>u;
+        int o=read(),u=read(),c;
         if(o==1){
-            cin>>c;
+            c=read();
             assign(dfn[u],dfn[u]+siz[u]-1,c);
         }else{
             int lf=dfn[u],rt=dfn[u]+siz[u]-1,ans=0;
@@ -79,7 +94,7 @@ int main(){
                 if(!colt[it->val]) ++ans,colt[it->val]=true;
                 if(ans==60) break;
             }
-            cout<<ans<<endl;
+            print(ans),putchar('\n');
         }
     }
     return 0;
