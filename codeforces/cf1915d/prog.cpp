@@ -1,4 +1,3 @@
-
 #include <bits/stdc++.h>
 using namespace std;
 map<char,int> cv={{'a',0},{'b',1},{'c',1},{'d',1},{'e',0}};
