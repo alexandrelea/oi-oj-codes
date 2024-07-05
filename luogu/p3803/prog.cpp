@@ -1,38 +1,57 @@
 #include <bits/stdc++.h>
-#define fs(x) fixed<<setprecision(x)
 using namespace std;
-const double PI=acos(-1),EPS=1e-7;
-const int N=1e6+10,K=100;
-vector<complex<double>> omg,comg;
-complex<double> a[N*4],b[N*4];
-int n,m,k;
-void fft(complex<double> a[],int n,int invt){
-    if(n==1) return;
-    int m=n/2;
-    complex<double> a1[m+1],a2[m+1];
-    for(int i=0;i<=n;i+=2) a1[i/2]=a[i],a2[i/2]=a[i+1];
-    fft(a1,m,invt),fft(a2,m,invt);
-    complex<double> w0(1,0),wn(cos(2*PI/n),invt*sin(2*PI/n));
-    for(int i=0;i<m;++i,w0*=wn) a[i]=a1[i]+w0*a2[i],a[i+n/2]=a1[i]-w0*a2[i];
-    return;
+const int N=1e6;
+const double pi=acos(-1);
+struct clex{
+    double re,im;
+    clex(double re=0,double im=0):re(re),im(im){}
+    clex operator+(const clex &rhs)const{
+        return clex(re+rhs.re,im+rhs.im);
+    }
+    clex operator-(const clex &rhs)const{
+        return clex(re-rhs.re,im-rhs.im);
+    }
+    clex operator*(const clex &rhs)const{
+        return clex(re*rhs.re-im*rhs.im,re*rhs.im+im*rhs.re);
+    }
+    clex operator/(const double &rhs)const{
+        return clex(re/rhs,im/rhs);
+    }
+};
+int n,m,h,nu,ju[(N<<2)+10];
+clex a[(N<<2)+10],b[(N<<2)+10],c[(N<<2)+10];
+void pre(int l){
+    memset(ju,0,sizeof ju);
+    for(int i=0;i<l;++i){
+        ju[i]=ju[i>>1]>>1;
+        if(i&1) ju[i]|=l>>1;
+    }
+}
+void fft(clex f[],int l,int re){
+    for(int i=0;i<l;++i) if(i<ju[i]) swap(f[i],f[ju[i]]);
+    for(int i=2;i<=l;i<<=1){
+        double th=2*pi/(double)i;
+        clex step=clex(cos(th),re*sin(th));
+        for(int j=0;j<l;j+=i){
+            clex cur=clex(1,0);
+            for(int k=j;k<j+i/2;++k){
+                clex u=f[k],v=f[k+i/2]*cur;
+                f[k]=u+v,f[k+i/2]=u-v;
+                cur=cur*step;
+            }
+        }
+    }
+    if(re==-1) for(int i=0;i<l;++i) f[i]=f[i]/(double)l;
 }
 int main(){
-    ios::sync_with_stdio(false);
     cin>>n>>m;
-    for(int i=0;i<=n;++i){
-        double x;
-        cin>>x;
-        a[i].real(x);
-    }
-    for(int i=0;i<=m;++i){
-        double x;
-        cin>>x;
-        b[i].real(x);
-    }
-    for(k=2;k<=n+m;k<<=1);
-    fft(a,k,1),fft(b,k,1);
-    for(int i=0;i<=k;++i) a[i]=a[i]*b[i];
-    fft(a,k,-1);
-    for(int i=0;i<=n+m;++i) cout<<fs(0)<<(a[i].real()/k+EPS)<<" ";
+    for(int i=0;i<=n;++i) cin>>nu,a[i]=clex(nu,0);
+    for(int i=0;i<=m;++i) cin>>nu,b[i]=clex(nu,0);
+    for(h=2;h<=n+m;h<<=1);
+    pre(h);
+    fft(a,h,1),fft(b,h,1);
+    for(int i=0;i<h;++i) c[i]=a[i]*b[i];
+    fft(c,h,-1); 
+    for(int i=0;i<=n+m;++i) cout<<fixed<<setprecision(0)<<(int)(c[i].re+0.5)<<" ";
     return 0;
 }
