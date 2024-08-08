@@ -1,1 +1,1 @@
-This is a repository and it saves my codes in OI(the Olympiad of Informatics) and CP(Competitive Programming).
+This is a repository and it saves my codes in CP(Competitive Programming).
