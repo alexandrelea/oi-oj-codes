@@ -1,5 +1,5 @@
 // LG3205 - [HNOI2010] 合唱队
-// Code by Alexanderia Lea;
+// Code by Alexanderia Lea
 #include <bits/stdc++.h>
 using namespace std;
 const int N=2005,M=19650827;
