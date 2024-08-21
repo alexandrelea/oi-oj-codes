@@ -1,35 +1,42 @@
-#include <iostream>
+// P4777 - 【模板】扩展中国剩余定理（EXCRT）
+// Code by Alexandre Lea
+#include <bits/stdc++.h>
 using namespace std;
-const int SIZE=1e5+10;
-long long exgcd(long long a,long long b,long long &x,long long &y){
-    if(b==0) return x=1,y=0,a;
-    else{
-        long long res=exgcd(b,a%b,x,y),t=x;
-        x=y,y=t-a/b*y;
-        return res; 
-    }
+typedef long long ll;
+typedef __int128_t i128;
+const int N=1e7+5;
+int n;
+ll v;
+i128 a[N],r[N];
+template<typename inte>
+inte gcd(inte a,inte b){
+    return b==0?a:gcd(b,a%b);
 }
-long long mul(long long a,long long b,long long mod){
-    long long res=0,base=a;
-    for(;b!=0;b/=2,base=base*2%mod) if(b%2==1) res=(res+base)%mod;
-    return res;
+template<typename inte>
+void exgcd(inte a,inte b,inte &x,inte &y){
+    if(b==0) x=1,y=0;
+    else exgcd(b,a%b,y,x),y-=a/b*x;
 }
-long long exCRT(int n,long long *a,long long *b){
-    long long m=b[1],ans=a[1];
-    for(int i=1;i<=n;i++){
-        long long p=((a[i]-ans)%b[i]+b[i])%b[i];
-        long long x,y,gcd=exgcd(m,b[i],x,y);
-        if(p%gcd!=0) return -1;
-        x=mul(x,p/gcd,b[i]/gcd);
-        ans+=x*m,m*=b[i]/gcd,ans=(ans%m+m)%m;
+template<typename inte>
+inte abs(inte x){
+    return x>=0?x:-x;
+}
+template<typename inte>
+inte exCRT(int n,inte a[],inte r[]){
+    inte ap=a[1],rp=r[1];
+    for(int i=2;i<=n;++i){
+        inte aq=a[i],rq=r[i],hp,hq,g=gcd(ap,aq),r=((rq-rp+aq)%aq+aq)%aq;
+        if(r%g!=0) return -1;
+        exgcd(ap,aq,hp,hq),hp*=(r/g);
+        rp=hp*ap+rp,ap*=(aq/g);
+        rp=((rp+ap)%ap+ap)%ap;
     }
-    return (ans%m+m)%m;
+    return (rp+ap)%ap;
 }
 int main(){
-    int n;
-    long long a[SIZE],b[SIZE];
-    cin>>n;
-    for(int i=1;i<=n;i++) cin>>b[i]>>a[i];
-    cout<<exCRT(n,a,b)<<endl;
+    while(cin>>n){
+        for(int i=1;i<=n;++i) cin>>v,a[i]=v,cin>>v,r[i]=v;
+        cout<<(v=exCRT(n,a,r))<<endl;
+    }
     return 0;
 }
