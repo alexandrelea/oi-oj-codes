@@ -1,4 +1,4 @@
-// P4777 - 【模板】扩展中国剩余定理（EXCRT）
+// LG4777 - 【模板】扩展中国剩余定理（EXCRT）
 // Code by Alexandre Lea
 #include <bits/stdc++.h>
 using namespace std;
