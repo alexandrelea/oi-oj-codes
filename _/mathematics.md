@@ -158,7 +158,7 @@ int CRT(int n,int a[],int r[]){
 $$\begin{cases}x\equiv r_p\pmod{a_p}\\ x\equiv r_q\pmod{a_q}\end{cases}$$
 
 我们可以用定义得到这样两条方程：
-s
+
 $$\begin{cases}x=r_p+h_pa_p\\ x=r_q+h_qa_q\end{cases}$$
 
 消掉 $x$，并把未知数 $h_p,h_q$ 移到等式左边，我们得到
@@ -168,7 +168,6 @@ $$h_pa_p-h_qa_q=r_q-r_p$$
 或者当我们令 $r=r_q-r_p$ 时，我们的方程可以写成
 
 $$h_pa_p\equiv r\pmod{a_q}$$
-
 
 我们可以用扩展欧几里得算法解出 $h_p$，代入就得到满足两个方程的一个 $x'=h_pa_p+r_p$，这样我们可以做变量代换 $(x',[a_p,a_q])\to(r_p,a_p)$，我们就把两个方程合并为一个。
 
@@ -189,3 +188,34 @@ int exCRT(int n,int a[],int r[]){
     return (rp+ap)%ap;
 }
 ```
+
+## 欧拉函数
+
+这里的欧拉函数 $\varphi(n)$，它的式子可以写作
+
+$$\varphi(n)=\sum_{k=1}^{n}[(n,k)=1]$$
+
+显然，$\varphi(p)=p-1$，且对于 $(a,b)=1$ 的数对 $(a,b),\varphi(ab)=\varphi(a)\varphi(b)$。所以……我们可以用欧拉筛法。即
+
+```cpp
+memset(vis,0,sizeof vis);
+pc=0;
+for(int i=2;i<=n;++i){
+    if(vis[i]==0) pr[++pc]=i,phi[i]=i-1;
+    for(int j=1;j<=pc&&i*pr[j]<=n;++j){
+        vis[i*pr[j]]=0;
+        if(i%pr[j]!=0) phi[i*pr[j]]=phi[i]*(pr[j]-1);
+        else{
+            phi[i*pr[j]]=phi[i]*pr[j];
+            break;
+        }
+    }
+}
+```
+
+为什么 `else` 开头的话能这样写呢？我们可以看看 $\varphi$ 函数的另一种写法
+
+$$\varphi(n)=n\prod_{p\in\mathbb P\land p\backslash n}\left(1-\frac 1p\right)$$
+
+当我们已经求出 $\varphi(m)$，并知道 $n=pm$，我们可以由上式推得 $\varphi(n)=p\varphi(m)$。
+
