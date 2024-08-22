@@ -1,7 +1,6 @@
 // UVa11149 - Power of Matrix
 // Code bu Alexandre Lea
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 int n,k;
 struct phx{
@@ -35,7 +34,7 @@ void mul(phx C[][3],phx A[][3],phx B[][3]){
 }
 void solve(){
     A=0;
-    for(int i=1;i<=n;++i) for(int j=1;j<=n;++j) cin>>A.M[i][j];
+    for(int i=1;i<=n;++i) for(int j=1;j<=n;++j) cin>>A.M[i][j],A.M[i][j]%=10;
     for(int i=1;i<=2;++i) for(int j=1;j<=2;++j) C[i][j]=I[i][j]=0;
     C[1][1]=C[2][1]=A,I[1][1]=I[2][2]=C[2][2]=1;
     for(;k;k>>=1,mul(C,C,C)){
@@ -46,7 +45,7 @@ void solve(){
         for(int j=2;j<=n;++j) cout<<" "<<I[2][1].M[i][j];
     }
 }
-signed main(){
+int main(){
     bool _=0;
     while(cin>>n>>k&&(n||k)){
         if(_) cout<<endl;
