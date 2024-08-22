@@ -153,7 +153,9 @@ int CRT(int n,int a[],int r[]){
 }
 ```
 
-当然，如果它们不互质，只有一个办法，即两两合并等式。对于两条方程
+当然，如果它们不互质，有两个办法（第二个办法我们暂不介绍）。
+
+第一个方法即两两合并等式。对于两条方程
 
 $$\begin{cases}x\equiv r_p\pmod{a_p}\\ x\equiv r_q\pmod{a_q}\end{cases}$$
 
@@ -219,3 +221,36 @@ $$\varphi(n)=n\prod_{p\in\mathbb P\land p\backslash n}\left(1-\frac 1p\right)$$
 
 当我们已经求出 $\varphi(m)$，并知道 $n=pm$，我们可以由上式推得 $\varphi(n)=p\varphi(m)$。
 
+# 线性代数
+## $n$ 元线性方程组
+
+对于方程组
+$$
+\begin{cases}
+a_{11}x_1+a_{12}x_2+\cdots+a_{1n}x_n=b_1\\
+a_{21}x_1+a_{22}x_2+\cdots+a_{2n}x_n=b_1\\
+\cdots\\
+a_{n1}x_1+a_{n2}x_2+\cdots+a_{nn}x_n=b_n\\
+\end{cases}
+$$
+我们可以写作矩阵乘法的形式，即
+$$
+\begin{bmatrix}
+a_{11}&a_{12}&\cdots&a_{1n}\\
+a_{21}&a_{22}&\cdots&a_{2n}\\
+\vdots&\vdots&\ddots&\vdots\\
+a_{n1}&a_{n2}&\cdots&a_{nn}
+\end{bmatrix}
+\begin{bmatrix}x_1\\x_2\\\vdots\\x_n\end{bmatrix}
+=
+\begin{bmatrix}b_1\\b_2\\\vdots\\b_n\end{bmatrix}
+$$
+简化一下，即
+$$\mathbf A\mathbf x=\mathbf b$$
+现在我们的任务是解出 $\mathbf x$ 的各个分量。
+
+首先，我们令 $\mathbf M=\begin{bmatrix}\mathbf A|\mathbf b\end{bmatrix}$，即把 $\mathbf A$ 和 $\mathbf b$ 并成一个 $n\times (n+1)$ 的矩阵。随后，我们可以使用 Gauss-Jordan 法进行消元。
+
+### Gauss-Jordan 法
+
+对于 $\mathbf M$ 的第 $l$ 行方程，我们的目标是把所有行中带 $l$ 的都消掉。这样，我们只需要第 $l$ 行的数都乘以 $\mathbf M_{l,l}^{-1}$，随后把除了 $l$ 以外的行 $k$ 都减去 $\mathbf M_{k,l}$ 倍的第 $l$ 行即可。但是，没有这样简单。（你以为就完了？）
