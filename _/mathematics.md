@@ -222,6 +222,16 @@ $$\varphi(n)=n\prod_{p\in\mathbb P\land p\backslash n}\left(1-\frac 1p\right)$$
 当我们已经求出 $\varphi(m)$，并知道 $n=pm$，我们可以由上式推得 $\varphi(n)=p\varphi(m)$。
 
 # 线性代数
+
+## 矩阵的运算
+
+对于两个大小为 $nm$ 的矩阵，加法定义如下：
+$$\mathbf A\pm\mathbf B=\mathbf C\Leftrightarrow \mathbf A_{ij}\pm\mathbf B_{ij}=\mathbf C_{ij}$$
+
+对于大小为 $nm$ 和 $mk$ 的两个矩阵，乘法定义如下：
+$$\mathbf C=\mathbf A\mathbf B\Leftrightarrow\mathbf C_{ij}=\sum_{k=1}^m\mathbf A_{ik}\mathbf B_{kj}$$
+
+
 ## $n$ 元线性方程组
 
 对于方程组
@@ -257,4 +267,65 @@ $$\mathbf A\mathbf x=\mathbf b$$
 
 ### LU 法
 
-还没学会。。。
+倘若我们可以把前面的系数矩阵分解成两个三角矩阵的乘积，我们的回代过程会大大加速。例如，我们有方程
+
+$$
+\begin{bmatrix}2&-1&1\\4&1&-1\\1&1&1\end{bmatrix}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}=\begin{bmatrix}1\\5\\0\end{bmatrix}
+$$
+
+做 LU 分解，我们来观察一个具体的例子：
+
+$$
+\begin{bmatrix}1\\a&1\\b&c&1\end{bmatrix}\begin{bmatrix}d&e&f\\&g&h\\&&i\end{bmatrix}=\begin{bmatrix}2&-1&1\\4&1&-1\\1&1&1\end{bmatrix}
+$$
+
+我们知道，$1d=2$，所以 $d=2$；$2a=4$，所以 $a=2$。而 $e=-1,f=1$ 则是与 $1$ 相乘后不言自明的。
+
+$$
+\begin{bmatrix}1\\2&1\\b&c&1\end{bmatrix}\begin{bmatrix}2&-1&1\\&g&h\\&&i\end{bmatrix}=\begin{bmatrix}2&-1&1\\4&1&-1\\1&1&1\end{bmatrix}
+$$
+
+随即，我们知道 $2\times(-1)+g=1$，解得 $g=3$；$2+h=-1$，解得 $h=-3$。同时由于 $2b=1$，解得 $b=1/2$；同时 $-1\times(1/2)+3c=1$，解得 $c=1/2$。并且，$i$ 可以求出：$1/2-3\times(1/2)+i=1$，解得 $i=2$。
+
+$$
+\begin{bmatrix}1\\2&1\\1/2&1/2&1\end{bmatrix}\begin{bmatrix}2&-1&1\\&3&-3\\&&2\end{bmatrix}=\begin{bmatrix}2&-1&1\\4&1&-1\\1&1&1\end{bmatrix}
+$$
+
+验证一下，这是正确的。故我们首先解方程
+
+$$\begin{bmatrix}1\\2&1\\1/2&1/2&1\end{bmatrix}\left(\begin{bmatrix}2&-1&1\\&3&-3\\&&2\end{bmatrix}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}\right)=\begin{bmatrix}1\\5\\0\end{bmatrix}$$
+
+中的小括号部分，我们把它叫做 $\mathbf y$，解得其等于 $\begin{bmatrix}1&3&-2\end{bmatrix}^T$，即
+
+$$\begin{bmatrix}2&-1&1\\&3&-3\\&&2\end{bmatrix}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}=\begin{bmatrix}1\\3\\-2\end{bmatrix}$$
+
+解得 $\mathbf x=\begin{bmatrix}1&0&-1\end{bmatrix}^T$。代入原来的矩阵，是正确的。
+
+那么这个东西能否按照一种机械的步骤进行呢？答案自然是可以，不然它也不会出现在这里。
+
+设一个 $n^2$ 的矩阵 $\mathbf M$，我们的目标是把它分解为两个矩阵 $\mathbf L$ 和 $\mathbf U$ 的乘积。即
+
+$$\begin{bmatrix}1\\\mathbf L_{21}&1\\\vdots&\vdots&\ddots\\\mathbf L_{n1}&\mathbf L_{n2}&\cdots&1\end{bmatrix}\begin{bmatrix}\mathbf U_{11}&\mathbf U_{12}&\cdots&\mathbf U_{1n}\\&\mathbf U_{22}&\cdots&\mathbf U_{2n}\\&&\ddots&\vdots\\&&&\mathbf U_{nn}\end{bmatrix}=\begin{bmatrix}\mathbf M_{11}&\mathbf M_{12}&\cdots&\mathbf M_{1n}\\\mathbf M_{21}&\mathbf M_{22}&\cdots&\mathbf M_{2n}\\\vdots&\vdots&\ddots&\vdots\\\mathbf M_{n1}&\mathbf M_{n2}&\cdots&\mathbf M_{nn}\end{bmatrix}$$
+
+我们使用递归解这个问题，即我们先完成 $\mathbf L$ 的首列与 $\mathbf U$ 的首行，然后第二列第二行，以此类推，我们就解决了问题。
+
+首先，$\mathbf U$ 的第一行……可以直接得出，随即 $\mathbf L$ 的第一列也可以：
+
+$$\begin{bmatrix}1\\\mathbf M_{21}/\mathbf M_{11}&1\\\vdots&\vdots&\ddots\\\mathbf M_{n1}/\mathbf M_{11}&\mathbf L_{n2}&\cdots&1\end{bmatrix}\begin{bmatrix}\mathbf M_{11}&\mathbf M_{12}&\cdots&\mathbf M_{1n}\\&\mathbf U_{22}&\cdots&\mathbf U_{2n}\\&&\ddots&\vdots\\&&&\mathbf U_{nn}\end{bmatrix}=\begin{bmatrix}\mathbf M_{11}&\mathbf M_{12}&\cdots&\mathbf M_{1n}\\\mathbf M_{21}&\mathbf M_{22}&\cdots&\mathbf M_{2n}\\\vdots&\vdots&\ddots&\vdots\\\mathbf M_{n1}&\mathbf M_{n2}&\cdots&\mathbf M_{nn}\end{bmatrix}$$
+
+随即第二行，我们可以……把 $\mathbf U$ 的首行与 $\mathbf L$ 的首列的各个元素相乘，然后减去。第三列，第四列，第五列需要减去的内容有点多，但这不是问题。
+
+（请注意，我们现在用粗体小写字母表示列向量。）
+
+设 $\mathbf L=\begin{bmatrix}\mathbf l_1&\cdots&\mathbf l_n\end{bmatrix}$，$\mathbf U=\begin{bmatrix}\mathbf u_1'&\cdots&\mathbf u_n'\end{bmatrix}'$，我们可以这样表示，即 $\mathbf M=\mathbf L\mathbf U=\mathbf l_1\mathbf u_1'+\cdots+\mathbf l_n\mathbf u'_n$。
+
+则首先，
+
+$$\mathbf u_1'=\begin{bmatrix}\mathbf M_{11}&\mathbf M_{12}&\mathbf M_{13}&\cdots&\mathbf M_{1n}\end{bmatrix}$$
+$$\mathbf l_1=\frac{1}{\mathbf M_{11}}\begin{bmatrix}\mathbf M_{11}&\mathbf M_{21}&\mathbf M_{31}&\cdots&\mathbf M_{n1}\end{bmatrix}'$$
+
+那么 $\mathbf l_1\mathbf u_1'$ 的解我们就已经知道了，然后用原矩阵减去它们的乘积，然后递归处理即可。当然，循环也不是不可以。
+
+在这份代码里，我们会把 $\mathbf L$ 和 $\mathbf U$ 分开来存，但是在实际的应用中，$\mathbf L$ 和 $\mathbf U$ 会被覆盖到 $\mathbf M$ 上。
+
+当然，如果你要直接写出解析式的话它会变成依托史（对于 $\mathbf M(4\times 4)$）：![](LU.png)。
