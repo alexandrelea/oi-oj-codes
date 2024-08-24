@@ -102,6 +102,17 @@ void exgcd(int a,int b,int &x,int &y){
 ```
 如果解 $ax+by=c$ 时带入即可，当然，如果 $\lnot (a,b)\backslash c$，则无解。
 
+## 逆元
+
+这里我们可以分两种情况解释逆元：模数 $m$ 为质数，或不为质数，但我们要求解的问题都符合
+
+$$a\alpha\equiv1\pmod m$$
+
+这里 $a,m$ 已知。
+
++ $m$ 为质数——由费马小定理 $a^p\equiv a\pmod p$，我们求 $a^{p-2}\equiv a^{-1}\equiv\alpha\pmod p$ 即可。
++ $m$ 不为质数——由定义，我们知道 $a\alpha+mk=1$，用 exgcd 求 $\alpha$ 的值即可，别忘了使它符合取模的范围！
+
 ## 一元模方程组
 
 考虑如下方程组（满足 $a$ 两两互质）
@@ -328,4 +339,16 @@ $$\mathbf l_1=\frac{1}{\mathbf M_{11}}\begin{bmatrix}\mathbf M_{11}&\mathbf M_{2
 
 在这份代码里，我们会把 $\mathbf L$ 和 $\mathbf U$ 分开来存，但是在实际的应用中，$\mathbf L$ 和 $\mathbf U$ 会被覆盖到 $\mathbf M$ 上。
 
-当然，如果你要直接写出解析式的话它会变成依托史（对于 $\mathbf M(4\times 4)$）：![](LU.png)。
+当然，如果你要直接写出解析式的话它会变成依托史（对于 $\mathbf M(4\times 4)$）：[](LU.png)。
+
+这里我们不会涉及这个算法。
+
+## 快速幂求递推式
+
+众所周知，斐波那契数列可以通过递推式进行。这是因为，如果我们把斐波那契数列写成 $F_n$，由于它只涉及 $F_{n-1}$ 所以一个列向量就可以被写出。进而，我们可以通过矩阵乘法求出 $F_{n+1}$，与 $F_n$ 组合一下就可以得到 $F$ 的各项。对于斐波那契数列，
+
+$$\begin{bmatrix}F_{n+1}\\F_n\end{bmatrix}=\begin{bmatrix}1&1\\1&0\end{bmatrix}\begin{bmatrix}F_n\\F_{n-1}\end{bmatrix}$$
+
+当然，我们可以往矩阵里面塞各种东西，甚至包括矩阵。当然，由于部分原因，这里就不放了。
+
+如果我们要求 $F_k$，我们可以把那个矩阵进行 $k$ 次的快速幂，就得到了我们想要的东西。
