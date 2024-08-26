@@ -270,78 +270,50 @@ $$
 $$\mathbf A\mathbf x=\mathbf b$$
 现在我们的任务是解出 $\mathbf x$ 的各个分量。
 
-首先，我们令 $\mathbf M=\begin{bmatrix}\mathbf A|\mathbf b\end{bmatrix}$，即把 $\mathbf A$ 和 $\mathbf b$ 并成一个 $n\times (n+1)$ 的矩阵。随后，我们可以使用 Gauss-Jordan 法进行消元。
+首先，我们令 $\mathbf M=\begin{bmatrix}\mathbf A|\mathbf b\end{bmatrix}$，即把 $\mathbf A$ 和 $\mathbf b$ 并成一个 $n\times (n+1)$ 的矩阵。随后，我们可以使用 Gauss-Jordan 法进行消元。事实上，这个算法可以判断无解或无穷解。
 
-### Gauss-Jordan 法
+首先，我们选取 $i$ 列最大的数 $\mathbf M_{hi}$（第 $h$ 行以前没有消过元！），并把整个第 $h$ 行与第 $i$ 行互换一下。如果 $\mathbf M_{ii}=0$ 的话，方程只能是无解或无穷解。
 
-对于 $\mathbf M$ 的第 $l$ 行方程，我们的目标是把所有行中带 $l$ 的都消掉。这样，我们只需要第 $l$ 行的数都乘以 $\mathbf M_{l,l}^{-1}$，随后把除了 $l$ 以外的行 $k$ 都减去 $\mathbf M_{k,l}$ 倍的第 $l$ 行即可。但是，没有这样简单。我们还没考虑无解或者多解的情况。
+第二步，我们把整个第 $i$ 行（已经互换的）除以 $\mathbf M_{ii}$，便于我们下一步的操作。
 
-### LU 法
+第三步，对于所有不是第 $i$ 行的行 $j$，我们都减去第 $i$ 行的 $\mathbf M_{ji}$ 倍。
 
-倘若我们可以把前面的系数矩阵分解成两个三角矩阵的乘积，我们的回代过程会大大加速。例如，我们有方程
+这样，我们的消元就结束了，而且我们可以保证第 $i$ 行一定对应着第 $i$ 元的解。如果有无解，那么在系数为 $0$ 的情况下，解为 $0$ 为无穷解，而解不为 $0$ 即为无解。
 
-$$
-\begin{bmatrix}2&-1&1\\4&1&-1\\1&1&1\end{bmatrix}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}=\begin{bmatrix}1\\5\\0\end{bmatrix}
-$$
+代码如下。
 
-做 LU 分解，我们来观察一个具体的例子：
-
-$$
-\begin{bmatrix}1\\a&1\\b&c&1\end{bmatrix}\begin{bmatrix}d&e&f\\&g&h\\&&i\end{bmatrix}=\begin{bmatrix}2&-1&1\\4&1&-1\\1&1&1\end{bmatrix}
-$$
-
-我们知道，$1d=2$，所以 $d=2$；$2a=4$，所以 $a=2$。而 $e=-1,f=1$ 则是与 $1$ 相乘后不言自明的。
-
-$$
-\begin{bmatrix}1\\2&1\\b&c&1\end{bmatrix}\begin{bmatrix}2&-1&1\\&g&h\\&&i\end{bmatrix}=\begin{bmatrix}2&-1&1\\4&1&-1\\1&1&1\end{bmatrix}
-$$
-
-随即，我们知道 $2\times(-1)+g=1$，解得 $g=3$；$2+h=-1$，解得 $h=-3$。同时由于 $2b=1$，解得 $b=1/2$；同时 $-1\times(1/2)+3c=1$，解得 $c=1/2$。并且，$i$ 可以求出：$1/2-3\times(1/2)+i=1$，解得 $i=2$。
-
-$$
-\begin{bmatrix}1\\2&1\\1/2&1/2&1\end{bmatrix}\begin{bmatrix}2&-1&1\\&3&-3\\&&2\end{bmatrix}=\begin{bmatrix}2&-1&1\\4&1&-1\\1&1&1\end{bmatrix}
-$$
-
-验证一下，这是正确的。故我们首先解方程
-
-$$\begin{bmatrix}1\\2&1\\1/2&1/2&1\end{bmatrix}\left(\begin{bmatrix}2&-1&1\\&3&-3\\&&2\end{bmatrix}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}\right)=\begin{bmatrix}1\\5\\0\end{bmatrix}$$
-
-中的小括号部分，我们把它叫做 $\mathbf y$，解得其等于 $\begin{bmatrix}1&3&-2\end{bmatrix}^T$，即
-
-$$\begin{bmatrix}2&-1&1\\&3&-3\\&&2\end{bmatrix}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}=\begin{bmatrix}1\\3\\-2\end{bmatrix}$$
-
-解得 $\mathbf x=\begin{bmatrix}1&0&-1\end{bmatrix}^T$。代入原来的矩阵，是正确的。
-
-那么这个东西能否按照一种机械的步骤进行呢？答案自然是可以，不然它也不会出现在这里。
-
-设一个 $n^2$ 的矩阵 $\mathbf M$，我们的目标是把它分解为两个矩阵 $\mathbf L$ 和 $\mathbf U$ 的乘积。即
-
-$$\begin{bmatrix}1\\\mathbf L_{21}&1\\\vdots&\vdots&\ddots\\\mathbf L_{n1}&\mathbf L_{n2}&\cdots&1\end{bmatrix}\begin{bmatrix}\mathbf U_{11}&\mathbf U_{12}&\cdots&\mathbf U_{1n}\\&\mathbf U_{22}&\cdots&\mathbf U_{2n}\\&&\ddots&\vdots\\&&&\mathbf U_{nn}\end{bmatrix}=\begin{bmatrix}\mathbf M_{11}&\mathbf M_{12}&\cdots&\mathbf M_{1n}\\\mathbf M_{21}&\mathbf M_{22}&\cdots&\mathbf M_{2n}\\\vdots&\vdots&\ddots&\vdots\\\mathbf M_{n1}&\mathbf M_{n2}&\cdots&\mathbf M_{nn}\end{bmatrix}$$
-
-我们使用递归解这个问题，即我们先完成 $\mathbf L$ 的首列与 $\mathbf U$ 的首行，然后第二列第二行，以此类推，我们就解决了问题。
-
-首先，$\mathbf U$ 的第一行……可以直接得出，随即 $\mathbf L$ 的第一列也可以：
-
-$$\begin{bmatrix}1\\\mathbf M_{21}/\mathbf M_{11}&1\\\vdots&\vdots&\ddots\\\mathbf M_{n1}/\mathbf M_{11}&\mathbf L_{n2}&\cdots&1\end{bmatrix}\begin{bmatrix}\mathbf M_{11}&\mathbf M_{12}&\cdots&\mathbf M_{1n}\\&\mathbf U_{22}&\cdots&\mathbf U_{2n}\\&&\ddots&\vdots\\&&&\mathbf U_{nn}\end{bmatrix}=\begin{bmatrix}\mathbf M_{11}&\mathbf M_{12}&\cdots&\mathbf M_{1n}\\\mathbf M_{21}&\mathbf M_{22}&\cdots&\mathbf M_{2n}\\\vdots&\vdots&\ddots&\vdots\\\mathbf M_{n1}&\mathbf M_{n2}&\cdots&\mathbf M_{nn}\end{bmatrix}$$
-
-随即第二行，我们可以……把 $\mathbf U$ 的首行与 $\mathbf L$ 的首列的各个元素相乘，然后减去。第三列，第四列，第五列需要减去的内容有点多，但这不是问题。
-
-（请注意，我们现在用粗体小写字母表示列向量。）
-
-设 $\mathbf L=\begin{bmatrix}\mathbf l_1&\cdots&\mathbf l_n\end{bmatrix}$，$\mathbf U=\begin{bmatrix}\mathbf u_1'&\cdots&\mathbf u_n'\end{bmatrix}'$，我们可以这样表示，即 $\mathbf M=\mathbf L\mathbf U=\mathbf l_1\mathbf u_1'+\cdots+\mathbf l_n\mathbf u'_n$。
-
-则首先，
-
-$$\mathbf u_1'=\begin{bmatrix}\mathbf M_{11}&\mathbf M_{12}&\mathbf M_{13}&\cdots&\mathbf M_{1n}\end{bmatrix}$$
-$$\mathbf l_1=\frac{1}{\mathbf M_{11}}\begin{bmatrix}\mathbf M_{11}&\mathbf M_{21}&\mathbf M_{31}&\cdots&\mathbf M_{n1}\end{bmatrix}'$$
-
-那么 $\mathbf l_1\mathbf u_1'$ 的解我们就已经知道了，然后用原矩阵减去它们的乘积，然后递归处理即可。当然，循环也不是不可以。
-
-在这份代码里，我们会把 $\mathbf L$ 和 $\mathbf U$ 分开来存，但是在实际的应用中，$\mathbf L$ 和 $\mathbf U$ 会被覆盖到 $\mathbf M$ 上。
-
-当然，如果你要直接写出解析式的话它会变成依托史（对于 $\mathbf M(4\times 4)$）：[](LU.png)。
-
-这里我们不会涉及这个算法。
+```cpp
+int n;
+double M[107][107];
+bool vis[107];
+void gaussjordan(){
+    bool ok=1,inc=0;
+    for(int i=1;i<=n;++i){
+        int ii=i;
+        for(int j=1;j<=n;++j) if(!vis[j]&&fabs(M[ii][i])<fabs(M[j][i])) ii=j;
+        for(int j=1;j<=n+1;++j) swap(M[ii][j],M[i][j]);
+        if(fabs(M[i][i])<eps){
+            ok=0;
+            continue;
+        }
+        vis[i]=1;
+        // We've chosen the main unknown. In the normal case.
+        double mii=M[i][i];
+        for(int j=1;j<=n+1;++j) M[i][j]/=mii;
+        for(int j=1;j<=n;++j){
+            if(j==i) continue;
+            double c=M[j][i];
+            for(int k=1;k<=n+1;++k) M[j][k]-=M[i][k]*c;
+        }
+    }
+    if(ok){
+        for(int i=1;i<=n;++i) cout<<M[i][n+1]<<" "; // solution are M[i][n+1]s, needed to change
+    }else{
+        for(int i=1;i<=n;++i) if(fabs(M[i][i])<eps&&fabs(M[i][n+1])>eps)inc=1;
+        cout<<(inc?"inconsistent":"multiple")<<endl; // inconsistent(no solution) or infinitily many solutions.
+    }
+}
+```
 
 ## 快速幂求递推式
 
