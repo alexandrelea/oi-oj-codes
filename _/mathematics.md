@@ -232,6 +232,8 @@ $$\varphi(n)=n\prod_{p\in\mathbb P\land p\backslash n}\left(1-\frac 1p\right)$$
 
 当我们已经求出 $\varphi(m)$，并知道 $n=pm$，我们可以由上式推得 $\varphi(n)=p\varphi(m)$。
 
+一条重要的定理即欧拉定理，$1\equiv a^{\varphi(n)}\pmod n$，可以方便的求出逆元。不过需要预处理 $\varphi(n)$ 的值。
+
 # 线性代数
 
 ## 矩阵的运算
