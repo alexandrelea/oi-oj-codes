@@ -41,8 +41,49 @@ void nwedg(int u,int v,...){
 这个算法，如果未经过优化，复杂度是 $O(n^2+nm)$ 的，如果优化的话，寻找最小点就从 $O(n)$ 变为 $O(\log n)$，这样算法的时间复杂度就变成了 $O(n\log n+nm)$。于是，代码如下。
 
 ```cpp
-int dis[];
-void dijkstra(){
+
+int n,m,s,t,dis[N];
+bool vis[N];
+struct edg{
+    int u,v,w;
+    edg(int u=0,int v=0,int w=0):u(u),v(v),w(w){}
+};
+vector<edg> edge;
+vector<int> gr[N];
+void nwedg(int u,int v,int w){
+    edge.push_back(edg(u,v,w));
+    gr[u].push_back(edge.end()-edge.begin()-1);
+    edge.push_back(edg(v,u,w));
+    gr[v].push_back(edge.end()-edge.begin()-1);
+}
+void dijkstra(int s){
     priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> pq;
+    memset(dis,0x3f,sizeof(dis));
+    memset(vis,0,sizeof(vis));
+    dis[s]=0,pq.push({0,s});
+    while(!pq.empty()){
+        int u=pq.top().second;pq.pop();
+        if(vis[u]) continue;
+        vis[u]=1;
+        for(int ie:gr[u]){
+            int v=edge[ie].v,w=edge[ie].w;
+            if(dis[v]>dis[u]+w) dis[v]=dis[u]+w,pq.push({dis[v],v});
+        }
+    }
 }
 ```
+
+这份代码符合 C++11 的编译标准。
+
+## SPFA
+
+略。
+
+# 最小生成树
+
+给定一个无向图，选取边使得图连通，且选取的边的边权和最小。显然我们要建一棵树。
+
+## Kruskal 算法
+
+既然要求最小生成树，我们可以贪心，只需要把所有的边排序，一条边一条边建树，如果已经相连则不考虑（这里用并查集）。
+
