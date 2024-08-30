@@ -234,6 +234,24 @@ $$\varphi(n)=n\prod_{p\in\mathbb P\land p\backslash n}\left(1-\frac 1p\right)$$
 
 一条重要的定理即欧拉定理，$1\equiv a^{\varphi(n)}\pmod n$，可以方便的求出逆元。不过需要预处理 $\varphi(n)$ 的值。
 
+# 组合计数
+
+## 二项式定理
+
+定义 $n$ 个元素中任选 $m$ 个且方案重复不计，则方案总数为
+
+$$\binom{n}{m}=\frac{n!}{m!(n-m)!}$$
+
+## 二项式反演
+
+若设 $g(n)$ 为至多 $n$ 个/种的方案数量，$f(n)$ 为恰好 $n$ 个/种的方案数量，则
+
+$$g(n)=\sum_{i=0}^n\binom{n}{i}f(i)\Leftrightarrow f(n)=\sum_{i=0}^n\binom{n}{i}(-1)^{n-i}g(i)$$
+
+若设 $g(k)$ 为至少 $k$ 个/种的方案数量，$f(k)$ 为恰好 $k$ 个/种的方案数量，则
+
+$$g(k)=\sum_{i=k}^n\binom{i}{k}f(i)\Leftrightarrow f(k)=\sum_{i=k}^n\binom{i}{k}(-1)^{i-k}g(i)$$
+
 # 线性代数
 
 ## 矩阵的运算
@@ -326,3 +344,4 @@ $$\begin{bmatrix}F_{n+1}\\F_n\end{bmatrix}=\begin{bmatrix}1&1\\1&0\end{bmatrix}\
 当然，我们可以往矩阵里面塞各种东西，甚至包括矩阵。当然，由于部分原因，这里就不放了。
 
 如果我们要求 $F_k$，我们可以把那个矩阵进行 $k$ 次的快速幂，就得到了我们想要的东西。
+
