@@ -234,6 +234,36 @@ $$\varphi(n)=n\prod_{p\in\mathbb P\land p\backslash n}\left(1-\frac 1p\right)$$
 
 一条重要的定理即欧拉定理，$1\equiv a^{\varphi(n)}\pmod n$，可以方便的求出逆元。不过需要预处理 $\varphi(n)$ 的值。
 
+## 离散对数
+
+题目的一般形式是
+$$a^x\equiv b\pmod m$$
+其中 $m$ 是**素数**。这保证了 $a^{-m}$ 的存在。我们只需要寻找 $x=1\sim m$ 的范围即可。
+
+如果我们能把 $x$ 写成 $qn-p$ 的形式，我们可以保留每一个 $a^{qn}$ 以及 $a^p$。如果 $ba^p=a^{qn}$ 那么很显然的，$x=qn-p$。现在要记录每一个 $ba^p$ 并枚举每一个 $qn$，它们的时间复杂度肯定是 $n+\frac mn$，可以通过~~显然~~·求得当 $n=\sqrt m$ 时时间复杂度是最小的。
+
+代码如下。
+
+```cpp
+ll log(ll a,ll b,ll p){
+    a%=p,b%=p;
+    if(a%p==b%p) return 1;
+    if(a==0&&b!=0) return -1;
+    if(b==1) return 0;
+    ll m=(ll)ceil(sqrt(p)),am=pw(a,m,p);
+    map<ll,ll> mem;
+    for(int i=0;i<=m;++i) mem[b]=i,b*=a,b%=p;
+    b=1;
+    for(int i=1;i<=m;++i){
+        b=b*am%p;
+        if(mem.count(b)) return i*m-mem[b];
+    }
+    return -1;
+}
+```
+
+需要注意的是，这个算法叫做 BSGS，即“大步小步”算法，不过由于有三个参数，所以就不换名字了吧。
+
 # 组合计数
 
 ## 二项式定理
