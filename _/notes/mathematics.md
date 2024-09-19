@@ -240,7 +240,7 @@ $$\varphi(n)=n\prod_{p\in\mathbb P\land p\backslash n}\left(1-\frac 1p\right)$$
 $$a^x\equiv b\pmod m$$
 其中 $m$ 是**素数**。这保证了 $a^{-m}$ 的存在。我们只需要寻找 $x=1\sim m$ 的范围即可。
 
-如果我们能把 $x$ 写成 $qn-p$ 的形式，我们可以保留每一个 $a^{qn}$ 以及 $a^p$。如果 $ba^p=a^{qn}$ 那么很显然的，$x=qn-p$。现在要记录每一个 $ba^p$ 并枚举每一个 $qn$，它们的时间复杂度肯定是 $\mathrm O(n+\frac mn)$，可以通过~~显然~~·求得当 $n=\sqrt m$ 时时间复杂度是最小的。
+如果我们能把 $x$ 写成 $qn-p$ 的形式，我们可以保留每一个 $a^{qn}$ 以及 $a^p$。如果 $ba^p=a^{qn}$ 那么很显然的，$x=qn-p$。现在要记录每一个 $ba^p$ 并枚举每一个 $qn$，它们的时间复杂度肯定是 $\mathrm O(n+\frac mn)$，可以通过均值不等式求得当 $n=\sqrt m$ 时时间复杂度是最小的。
 
 代码如下。
 
@@ -271,6 +271,10 @@ ll log(ll a,ll b,ll p){
 定义 $n$ 个元素中任选 $m$ 个且方案重复不计，则方案总数为
 
 $$\binom{n}{m}=\frac{n!}{m!(n-m)!}$$
+
+当需要对它取质数 $p$ 的模时，公式如下：
+
+$$\binom{n}{m}\equiv\binom{n\bmod p}{m\bmod p}\binom{\lfloor n/p\rfloor}{\lfloor m/p\rfloor}\pmod p$$
 
 ## 二项式反演
 
