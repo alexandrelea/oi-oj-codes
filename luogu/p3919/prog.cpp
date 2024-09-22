@@ -1,38 +1,54 @@
+// 洛谷 P3919 - 可持久化线段树 1（可持久化数组）
+// Code by Alexandre Lea
 #include <iostream>
 using namespace std;
-const int SIZE=1e6+5;
-int a[SIZE],n,m,q,rt[SIZE<<5],ch[SIZE<<5][2],val[SIZE<<5],cnt;
-void build(int &co,int lf,int rt){
-    co=++cnt;
-    if(lf==rt) return val[co]=a[lf],void();
-    int mi=lf+((rt-lf)>>1);
-    build(ch[co][0],lf,mi),build(ch[co][1],mi+1,rt);
+const int N=1e6+5;
+int n,m,a[N],tree[N<<5],ch[N<<5][2],rt[N<<5],tot;
+int build(int lf,int rt){
+    int u=++tot;
+    if(lf==rt) tree[u]=a[lf];
+    else{
+        int md=lf+((rt-lf)>>1);
+        ch[u][0]=build(lf,md);
+        ch[u][1]=build(md+1,rt);
+        tree[u]=tree[ch[u][0]]+tree[ch[u][1]];
+    }
+    return u;
 }
-void modify(int &co,int lf,int rt,int &qu,int mq,int mv){
-    co=++cnt;
-    ch[co][0]=ch[qu][0],ch[co][1]=ch[qu][1],val[co]=val[qu];
-    if(lf==rt) return val[co]=mv,void();
-    int mi=lf+((rt-lf)>>1);
-    if(mq<=mi) modify(ch[co][0],lf,mi,ch[qu][0],mq,mv);
-    else modify(ch[co][1],mi+1,rt,ch[qu][1],mq,mv);
+int change(int e,int lf,int rt,int ps,int vl){
+    int u=++tot;
+    tree[u]=tree[e],ch[u][0]=ch[e][0],ch[u][1]=ch[e][1];
+    if(lf==rt) tree[u]=vl;
+    else{
+        int md=lf+((rt-lf)>>1);
+        if(ps<=md) ch[u][0]=change(ch[e][0],lf,md,ps,vl);
+        else ch[u][1]=change(ch[e][1],md+1,rt,ps,vl);
+        tree[u]=tree[ch[u][0]]+tree[ch[u][1]];
+    }
+    return u;
 }
-int query(int co,int lf,int rt,int qx){
-    if(lf==rt) return val[co];
-    int mi=lf+((rt-lf)>>1);
-    if(qx<=mi) return query(ch[co][0],lf,mi,qx);
-    else return query(ch[co][1],mi+1,rt,qx);
+int get(int e,int lf,int rt,int ps){
+    if(lf==rt) return tree[e];
+    int md=lf+((rt-lf)>>1);
+    if(ps<=md) return get(ch[e][0],lf,md,ps);
+    else return get(ch[e][1],md+1,rt,ps);
 }
 int main(){
     ios::sync_with_stdio(false);
-    cin.tie(0),cout.tie(0);
+    int t=0;
     cin>>n>>m;
-    for(int i=1;i<=n;i++) cin>>a[i];
-    build(rt[0],1,n);
-    for(int i=1;i<=m;i++){
-        int hi,opt,x,v;
-        cin>>hi>>opt>>x;
-        if(opt==1) cin>>v,modify(rt[i],1,n,rt[hi],x,v);
-        if(opt==2) cout<<query(rt[hi],1,n,x)<<endl,rt[i]=rt[hi];
+    for(int i=1;i<=n;++i) cin>>a[i];
+    rt[0]=build(1,n);
+    while(m--){
+        int v,o,l,e;
+        cin>>v>>o>>l;
+        if(o==1){
+            cin>>e;
+            rt[++t]=change(rt[v],1,n,l,e);
+        }else{
+            cout<<get(rt[v],1,n,l)<<endl;
+            rt[t+1]=rt[v],++t;
+        }
     }
     return 0;
 }
