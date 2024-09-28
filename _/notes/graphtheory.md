@@ -113,3 +113,39 @@ int kruskal(){
     return ans;
 }
 ```
+
+# 杂项
+
+## 强连通分量
+
+这个算法是重要的。因此这里立即需要说明一下。
+
+我们定义强连通分量为原图的某个子图，满足强连通分量内任意两点可以互相到达。当然一个图内有多个强连通分量是一定的啦。
+
+所以此时我们需要抬出一个算法：Tarjan，由 R.E.Tarjan 发明。它的主体部分是一个 dfs，维护了两个数组 `dfn[]` 和 `low[]`，满足 `low[u]` 是 `u` 通过反向边找到的最小的 `dfn[u]`。这里先给出代码：
+
+```cpp
+int dfn[N],low[N],dft,scc[N],cscc;
+stack<int> stk;
+void dfs(int u){
+    dfn[u]=low[u]=++dft;
+    stk.push(u);
+    for(int e:gr[u]){
+        int v=edgs[e].v;
+        if(dfn[v]==0) dfs(v),low[u]=min(low[u],low[v]);
+        else if(scc[v]==0) low[u]=min(low[u],dfn[v]);
+    }
+    if(low[u]==dfn[u]){
+        ++cscc;
+        while(1){
+            int v=stk.top();
+            scc[v]=cscc,stk.pop();
+            if(v==u) break;
+        }
+    }
+}
+```
+
+我们来思考一下这个算法为什么是对的。首先，如果我们像一棵树似得遍历图，这样我们就可以把边分为向下的边和向回走的边。如果某个点 u 的某条向下的边最终连接到了向回的边，那么这个点不可能“包含”一个强连通分量“，这里 `low` 就描述了这一性质。否则的话，我们当然可以把这个点以及它的子树算作一个强连通分量。
+
+那么强连通分量里会有什么呢？显然，这个栈中的元素保留了 u 以及它的树子节点，所以此时把栈弹一弹就好啦~
