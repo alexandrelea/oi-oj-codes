@@ -8,17 +8,13 @@ struct edge{
     edge(int u=0,int v=0):u(u),v(v){}
 };
 int n,m,cco;
-int dfn[N],low[N],dft,inv[N<<3],vis[N];
+int dfn[N],low[N],dft,vis[N];
 bool cnu[N<<3];
 vector<edge> edges;
 vector<int> gr[N],cop[N];
 void adde(int u,int v){
     edges.push_back(edge(u,v));
     gr[u].push_back(edges.size()-1);
-    edges.push_back(edge(v,u));
-    gr[v].push_back(edges.size()-1);
-    inv[edges.size()-1]=edges.size()-2;
-    inv[edges.size()-2]=edges.size()-1;
 }
 void dfs(int u,int fa){
     dfn[u]=low[u]=++dft;
@@ -26,7 +22,7 @@ void dfs(int u,int fa){
         int v=edges[ei].v;
         if(dfn[v]==0){
             dfs(v,u),low[u]=min(low[u],low[v]);
-            if(dfn[u]<low[v]) cnu[ei]=1,cnu[inv[ei]]=1;
+            if(dfn[u]<low[v]) cnu[ei]=1,cnu[ei^1]=1;
         }else if(v!=fa&&dfn[v]!=0) low[u]=min(low[u],dfn[v]);
     }
 }
@@ -41,7 +37,7 @@ void trav(int u){
 }
 int main(){
     cin>>n>>m;
-    for(int i=1,a,b;i<=m;++i) cin>>a>>b,adde(a,b);
+    for(int i=1,a,b;i<=m;++i) cin>>a>>b,adde(a,b),adde(b,a);
     for(int i=1;i<=n;++i) if(dfn[i]==0) dfs(i,i);
     for(int i=1;i<=n;++i) if(vis[i]==0) ++cco,trav(i);
     for(int i=1;i<=n;++i) cop[vis[i]].push_back(i);
